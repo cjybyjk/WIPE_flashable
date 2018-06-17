@@ -15,6 +15,6 @@ A script for flash Project_WIPE into your device
     Open wipe_mode in your **internal storage** by using text editor.
 -   修改其中的值，保存后重启
     Change value on it,then save and reboot
--   ***可用的值***
+-   ***可用的值 (Values available)*** :
     powersave balance performance fast
 
