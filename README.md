@@ -18,3 +18,4 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 -   ***可用的值 (Values available)*** :
     powersave balance performance fast
 
+[下载卡刷包 (Download the flashable ZIP)](https://github.com/cjybyjk/WIPE_flashable/releases)
