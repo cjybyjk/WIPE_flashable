@@ -70,12 +70,19 @@ remount_system_rw() {
 
 get_prop() {
     # use echo to replace return
-    echo $(getprop "$1" | tr '[A-Z]' '[a-z]')
+    echo $(lcasechar `getprop "$1"`)
+}
+
+lcasechar() {
+    lowercase=$(echo $* | tr '[A-Z]' '[a-z]')
+    # use echo to replace return
+    echo $lowercase
 }
 
 get_platform() {
     case "$1" in
         # Qualcomm Snapdragon
+        "msm8939" ) platform="sd_615_616";;
         "msm8953" ) platform="sd_625_626";;
         "sdm636" ) platform="sd_636";;
         "msm8976" | "msm8956" ) platform="sd_652_650";;
@@ -103,6 +110,9 @@ get_platform() {
     echo $platform
 }
 
+OUTFD=$2
+ZIP=$3
+
 ui_print " "
 ui_print "**************************"
 ui_print "  Project WIPE installer"
@@ -112,11 +122,12 @@ ui_print "  ZIP flashable: cjybyjk"
 ui_print "     Version: 180603"
 ui_print "**************************"
 
-OUTFD=$2
-ZIP=$3
-
+platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
+platform=$(get_platform $platformA)
+if [ "unsupported" = "$platform" ]; then
 platformA=$(get_prop "ro.product.board")
 platform=$(get_platform $platformA)
+fi
 if [ "unsupported" = "$platform" ]; then
     platformA=$(get_prop "ro.board.platform")
     platform=$(get_platform $platformA)
@@ -132,29 +143,45 @@ ui_print "- Extracting files"
 
 ui_print "- Platform: $platformA"
     if [ -d "./platforms/$platform/" ]; then
+        # Show notice when flashing
+        if [ -f "./platforms/$platform/NOTICE" ]; then
+            ui_print "- NOTICE:"
+            ui_print "  `cat ./platforms/$platform/NOTICE`"
+        fi
         ui_print "- Copying files"
             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
             chmod 0755 /system/xbin/powercfg
             if [ -f "/system/etc/install-recovery.sh" ]; then
-                # restore backup from old versions
+                # restore backup
                 if [ -f "/system/etc/install-recovery.sh.wipebak" ]; then
                     rm -f "/system/etc/install-recovery.sh"
                     cp "/system/etc/install-recovery.sh.wipebak" "/system/etc/install-recovery.sh"
+                else
+                    cp "/system/etc/install-recovery.sh" "/system/etc/install-recovery.sh.wipebak"
                 fi
                 ui_print "  install-recovery.sh found, adding lines to it..."
                     echo "# Project WIPE support" >> /system/etc/install-recovery.sh
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/etc/install-recovery.sh
                     echo "/system/etc/install-recovery.sh.wipebak" >> /system/etc/install-recovery.sh
             elif [ -f "/system/bin/install-recovery.sh" ]; then
-                # restore backup from old versions
+                # restore backup
                 if [ -f "/system/bin/install-recovery.sh.wipebak" ]; then
                     rm -f "/system/bin/install-recovery.sh"
                     cp "/system/bin/install-recovery.sh.wipebak" "/system/bin/install-recovery.sh"
+                else
+                    cp "/system/bin/install-recovery.sh" "/system/bin/install-recovery.sh.wipebak"
                 fi
                 ui_print "  install-recovery.sh found, adding lines to it..."
                     echo "# Project WIPE support" >> /system/bin/install-recovery.sh
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/bin/install-recovery.sh
             elif [ -f "/system/bin/sysinit" ]; then
+                # restore backup
+                if [ -f "/system/bin/sysinit.wipebak" ]; then
+                    rm -f "/system/bin/sysinit"
+                    cp "/system/bin/sysinit.wipebak" "/system/bin/sysinit"
+                else
+                    cp "/system/bin/sysinit" "/system/bin/sysinit.wipebak"
+                fi
                 ui_print "  sysinit found, adding lines to it..."
                     echo "# Project WIPE support" >> /system/bin/sysinit
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/bin/sysinit
