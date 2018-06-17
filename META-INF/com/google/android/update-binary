@@ -103,8 +103,6 @@ get_platform() {
         "hi3650" ) platform="kirin_950_955";;
         "hi3660" ) platform="kirin_960";;
         "hi3670" ) platform="kirin_970";;
-        # other unsupported device
-        * ) platform="unsupported"
     esac
     # use echo to replace return
     echo $platform
@@ -122,16 +120,17 @@ ui_print "  ZIP flashable: cjybyjk"
 ui_print "     Version: 180603"
 ui_print "**************************"
 
+# get platform
+platform="unsupported"
 platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
+platformB=$(get_prop "ro.product.board")
+platformC=$(get_prop "ro.board.platform")
 platform=$(get_platform $platformA)
-if [ "unsupported" = "$platform" ]; then
-platformA=$(get_prop "ro.product.board")
-platform=$(get_platform $platformA)
-fi
-if [ "unsupported" = "$platform" ]; then
-    platformA=$(get_prop "ro.board.platform")
-    platform=$(get_platform $platformA)
-fi
+platform=$(get_platform $platformB)
+platform=$(get_platform $platformC)
+
+# list of files allow to append if device unsupport init.d
+fileList=`cat ./appendable_file_list`
 
 ui_print "- Mounting /system"
     remount_system_rw
@@ -141,7 +140,7 @@ ui_print "- Extracting files"
     cd /tmp/WIPE
     unzip -o "$ZIP"
 
-ui_print "- Platform: $platformA"
+ui_print "- Platform: $platform"
     if [ -d "./platforms/$platform/" ]; then
         # Show notice when flashing
         if [ -f "./platforms/$platform/NOTICE" ]; then
@@ -151,47 +150,29 @@ ui_print "- Platform: $platformA"
         ui_print "- Copying files"
             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
             chmod 0755 /system/xbin/powercfg
-            if [ -f "/system/etc/install-recovery.sh" ]; then
-                # restore backup
-                if [ -f "/system/etc/install-recovery.sh.wipebak" ]; then
-                    rm -f "/system/etc/install-recovery.sh"
-                    cp "/system/etc/install-recovery.sh.wipebak" "/system/etc/install-recovery.sh"
-                else
-                    cp "/system/etc/install-recovery.sh" "/system/etc/install-recovery.sh.wipebak"
-                fi
-                ui_print "  install-recovery.sh found, adding lines to it..."
-                    echo "# Project WIPE support" >> /system/etc/install-recovery.sh
-                    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/etc/install-recovery.sh
-                    echo "/system/etc/install-recovery.sh.wipebak" >> /system/etc/install-recovery.sh
-            elif [ -f "/system/bin/install-recovery.sh" ]; then
-                # restore backup
-                if [ -f "/system/bin/install-recovery.sh.wipebak" ]; then
-                    rm -f "/system/bin/install-recovery.sh"
-                    cp "/system/bin/install-recovery.sh.wipebak" "/system/bin/install-recovery.sh"
-                else
-                    cp "/system/bin/install-recovery.sh" "/system/bin/install-recovery.sh.wipebak"
-                fi
-                ui_print "  install-recovery.sh found, adding lines to it..."
-                    echo "# Project WIPE support" >> /system/bin/install-recovery.sh
-                    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/bin/install-recovery.sh
-            elif [ -f "/system/bin/sysinit" ]; then
-                # restore backup
-                if [ -f "/system/bin/sysinit.wipebak" ]; then
-                    rm -f "/system/bin/sysinit"
-                    cp "/system/bin/sysinit.wipebak" "/system/bin/sysinit"
-                else
-                    cp "/system/bin/sysinit" "/system/bin/sysinit.wipebak"
-                fi
-                ui_print "  sysinit found, adding lines to it..."
-                    echo "# Project WIPE support" >> /system/bin/sysinit
-                    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/bin/sysinit
-            elif [ -d /system/etc/init.d ]; then
+            if [ -d /system/etc/init.d ]; then
                 ui_print "  init.d found, creating file on it..."
-                ui_print "    WARNING: This method may be invalid"
                     echo "#!/system/bin/sh" > /system/etc/init.d/99prjwipe
                     echo "# Project WIPE support" >> /system/etc/init.d/99prjwipe
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/etc/init.d/99prjwipe
                     chmod 0755 /system/etc/init.d/99prjwipe
+            else
+                for file in $fileList 
+                do
+                    if [ -f "$file" ]; then
+                        # restore backup
+                        if [ -f "$file.wipebak" ]; then
+                            rm -f "$file"
+                            cp "$file.wipebak" "$file"
+                        else
+                            cp "$file" "$file.wipebak"
+                        fi
+                        ui_print "  $file found, adding lines to it..."
+                            echo "# Project WIPE support" >> $file
+                            echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> $file
+                        continue
+                    fi
+                done
             fi
         ui_print "- Default mode: balance"
             if [ ! -f "/sdcard/wipe_mode" ]; then
