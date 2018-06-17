@@ -74,7 +74,7 @@ get_prop() {
 }
 
 lcasechar() {
-    lowercase=$(echo $* | tr '[a-z]' '[A-Z]')
+    lowercase=$(echo $* | tr '[A-Z]' '[a-z]')
     # use echo to replace return
     echo $lowercase
 }
