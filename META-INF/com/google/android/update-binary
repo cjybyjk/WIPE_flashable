@@ -152,25 +152,36 @@ ui_print "- Platform: $platformA"
             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
             chmod 0755 /system/xbin/powercfg
             if [ -f "/system/etc/install-recovery.sh" ]; then
-                # restore backup from old versions
+                # restore backup
                 if [ -f "/system/etc/install-recovery.sh.wipebak" ]; then
                     rm -f "/system/etc/install-recovery.sh"
                     cp "/system/etc/install-recovery.sh.wipebak" "/system/etc/install-recovery.sh"
+                else
+                    cp "/system/etc/install-recovery.sh" "/system/etc/install-recovery.sh.wipebak"
                 fi
                 ui_print "  install-recovery.sh found, adding lines to it..."
                     echo "# Project WIPE support" >> /system/etc/install-recovery.sh
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/etc/install-recovery.sh
                     echo "/system/etc/install-recovery.sh.wipebak" >> /system/etc/install-recovery.sh
             elif [ -f "/system/bin/install-recovery.sh" ]; then
-                # restore backup from old versions
+                # restore backup
                 if [ -f "/system/bin/install-recovery.sh.wipebak" ]; then
                     rm -f "/system/bin/install-recovery.sh"
                     cp "/system/bin/install-recovery.sh.wipebak" "/system/bin/install-recovery.sh"
+                else
+                    cp "/system/bin/install-recovery.sh" "/system/bin/install-recovery.sh.wipebak"
                 fi
                 ui_print "  install-recovery.sh found, adding lines to it..."
                     echo "# Project WIPE support" >> /system/bin/install-recovery.sh
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/bin/install-recovery.sh
             elif [ -f "/system/bin/sysinit" ]; then
+                # restore backup
+                if [ -f "/system/bin/sysinit.wipebak" ]; then
+                    rm -f "/system/bin/sysinit"
+                    cp "/system/bin/sysinit.wipebak" "/system/bin/sysinit"
+                else
+                    cp "/system/bin/sysinit" "/system/bin/sysinit.wipebak"
+                fi
                 ui_print "  sysinit found, adding lines to it..."
                     echo "# Project WIPE support" >> /system/bin/sysinit
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> /system/bin/sysinit
