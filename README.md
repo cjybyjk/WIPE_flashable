@@ -1,8 +1,8 @@
 # WIPE_flashable
-A script for flash Project_WIPE into your device
+A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-opt) into your device
 
 ### Thanks to
-[Project_WIPE](https://github.com/yc9559/cpufreq-interactive-opt) by [@yc9559](https://github.com/yc9559)
+[@yc9559](https://github.com/yc9559)
 
 ### How to use
 #### 刷入 (Flash)
