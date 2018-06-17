@@ -172,7 +172,7 @@ ui_print "- Platform: $platform"
                     echo "# Project WIPE support" >> ./supersu/su.d/99prjwipe
                     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> ./supersu/su.d/99prjwipe
                     chmod 0755 ./supersu/su.d/99prjwipe
-                ui_print "Unmounting su.img"
+                ui_print "  Unmounting su.img"
                     umount ./supersu
             else
                 appliedFlag=0
