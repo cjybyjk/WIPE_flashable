@@ -76,6 +76,7 @@ get_prop() {
 get_platform() {
     case "$1" in
         # Qualcomm Snapdragon
+        "msm8939" ) platform="sd_615_616";;
         "msm8953" ) platform="sd_625_626";;
         "sdm636" ) platform="sd_636";;
         "msm8976" | "msm8956" ) platform="sd_652_650";;
