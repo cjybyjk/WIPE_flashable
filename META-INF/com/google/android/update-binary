@@ -110,6 +110,9 @@ get_platform() {
     echo $platform
 }
 
+OUTFD=$2
+ZIP=$3
+
 ui_print " "
 ui_print "**************************"
 ui_print "  Project WIPE installer"
@@ -118,9 +121,6 @@ ui_print "  Project WIPE: yc9559"
 ui_print "  ZIP flashable: cjybyjk"
 ui_print "     Version: 180603"
 ui_print "**************************"
-
-OUTFD=$2
-ZIP=$3
 
 platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
 platform=$(get_platform $platformA)
