@@ -1,0 +1,4 @@
+/system/etc/init.qcom.post_boot.sh
+/system/etc/install-recovery.sh
+/system/bin/sysinit
+/system/bin/install-recovery.sh
