@@ -132,6 +132,11 @@ ui_print "- Extracting files"
 
 ui_print "- Platform: $platformA"
     if [ -d "./platforms/$platform/" ]; then
+        # Show notice when flashing
+        if [ -f "./platforms/$platform/NOTICE" ]; then
+            ui_print "- NOTICE:"
+            ui_print "  `cat ./platforms/$platform/NOTICE`"
+        fi
         ui_print "- Copying files"
             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
             chmod 0755 /system/xbin/powercfg
