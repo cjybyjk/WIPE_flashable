@@ -129,9 +129,6 @@ platform=$(get_platform $platformA)
 platform=$(get_platform $platformB)
 platform=$(get_platform $platformC)
 
-# list of files allow to append if device unsupport init.d
-fileList=`cat ./appendable_file_list`
-
 ui_print "- Mounting /system"
     remount_system_rw
 
@@ -139,6 +136,9 @@ ui_print "- Extracting files"
     mkdir /tmp/WIPE
     cd /tmp/WIPE
     unzip -o "$ZIP"
+
+# list of files allow to append if device unsupport init.d
+fileList=`cat ./appendable_file_list`
 
 ui_print "- Platform: $platform"
     if [ -d "./platforms/$platform/" ]; then
@@ -170,7 +170,7 @@ ui_print "- Platform: $platform"
                         ui_print "  $file found, adding lines to it..."
                             echo "# Project WIPE support" >> $file
                             echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> $file
-                        continue
+                        break
                     fi
                 done
             fi
