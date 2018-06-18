@@ -100,8 +100,8 @@ if [ ! -f /dev/project_wipe_runonce ]; then
 	set_value 3000000 /proc/sys/kernel/sched_freq_inc_notify
 
 	# avoid permission problem, do not set 0444
-	echo 6-7 > /dev/cpuset/background/cpus
-	echo 6-7 > /dev/cpuset/system-background/cpus
+	echo 2-3 > /dev/cpuset/background/cpus
+	echo 2-3 > /dev/cpuset/system-background/cpus
 	echo 0-3,4-7 > /dev/cpuset/foreground/cpus
 	echo 0-3,4-7 > /dev/cpuset/top-app/cpus
 
