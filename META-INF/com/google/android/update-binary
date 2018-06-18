@@ -82,30 +82,30 @@ lcasechar() {
 get_platform() {
     case "$1" in
         # Qualcomm Snapdragon
-        "msm8939" ) platform="sd_615_616";;
-        "msm8953" ) platform="sd_625_626";;
-        "sdm636" ) platform="sd_636";;
-        "msm8976" | "msm8956" ) platform="sd_652_650";;
-        "sdm660" ) platform="sd_660";;
-        "msm8974" | "apq8084" ) platform="sd_801_800_805";;
+        "msm8939" ) gplatform="sd_615_616";;
+        "msm8953" ) gplatform="sd_625_626";;
+        "sdm636" ) gplatform="sd_636";;
+        "msm8976" | "msm8956" ) gplatform="sd_652_650";;
+        "sdm660" ) gplatform="sd_660";;
+        "msm8974" | "apq8084" ) gplatform="sd_801_800_805";;
         "msm8994" | "msm8992" ) platform="sd_810_808";;
-        "msm8996" ) platform="sd_820_821";;
-        "msm8998" ) platform="sd_835";;
+        "msm8996" ) gplatform="sd_820_821";;
+        "msm8998" ) gplatform="sd_835";;
         # Mediatek
-        "mt6795" ) platform="helio_x10";;
-        "mt6797" ) platform="helio_x20_x25";;
+        "mt6795" ) gplatform="helio_x10";;
+        "mt6797" ) gplatform="helio_x20_x25";;
         # Intel Atom
-        "moorefield" ) platform="atom_z3560_z3580";;
+        "moorefield" ) gplatform="atom_z3560_z3580";;
         # Samsung Exynos
-        "universal8890" ) platform="exynos_8890";;
-        "universal8895" ) platform="exynos_8895";;
+        "universal8890" ) gplatform="exynos_8890";;
+        "universal8895" ) gplatform="exynos_8895";;
         # Hwawei Kirin
-        "hi3650" ) platform="kirin_950_955";;
-        "hi3660" ) platform="kirin_960";;
-        "hi3670" ) platform="kirin_970";;
+        "hi3650" ) gplatform="kirin_950_955";;
+        "hi3660" ) gplatform="kirin_960";;
+        "hi3670" ) gplatform="kirin_970";;
     esac
     # use echo to replace return
-    echo $platform
+    echo $gplatform
 }
 
 # $1:file $2:add head
@@ -160,19 +160,14 @@ ui_print "- Platform: $platform"
             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
             chmod 0755 /system/xbin/powercfg
             mkdir ./mountimg
-            # backup and set IFS
-            IFSBACKUP=$IFS
-            IFS=$(echo -en "\n")
-            flagApplied=0
-            for textinlist in `cat ./list_of_bootable`
-            do
-                fileFormat=`echo $textinlist | awk '{print \$1}'`
-                pathtofile=`echo $textinlist | awk '{print \$2}'`
-                pathinIMG=`echo $textinlist | awk '{print \$3}'`
+            cat ./list_of_bootable | while read lineinText
+            do 
+                fileFormat=`echo $lineinText | awk '{print \$1}'`
+                pathtofile=`echo $lineinText | awk '{print \$2}'`
+                pathinIMG=`echo $lineinText | awk '{print \$3}'`
                 case "$fileFormat" in
                 "[D]" )
                     if [ -d "$pathtofile" ]; then
-                        flagApplied=1
                         ui_print "  $pathtofile found, creating file on it..."
                             wipe_write "$pathtofile/99prjwipe" 1
                         break
@@ -180,7 +175,6 @@ ui_print "- Platform: $platform"
                     ;;
                 "[F]" )
                     if [ -f "$pathtofile" ]; then
-                        flagApplied=1
                         # restore backup
                         if [ -f "$pathtofile.wipebak" ]; then
                             rm -f "$pathtofile"
@@ -195,24 +189,17 @@ ui_print "- Platform: $platform"
                     ;;
                 "[I]" )
                     if [ -f "$pathtofile" ]; then
-                        flagApplied=1
                         ui_print "  $pathtofile found, mounting..."
                             mount "$pathtofile" ./mountimg
-                        ui_print "  creating file on $pathinIMG"
+                        ui_print "  creating file on $pathinIMG..."
                             wipe_write "./mountimg/$pathinIMG/99prjwipe" 1
-                        ui_print "Unmounting $pathtofile"
+                        ui_print "  Unmounting $pathtofile"
                             umount ./mountimg
                         break
                     fi
                     ;;
                 esac
             done
-            # restore IFS
-            IFS=$IFSBACKUP
-            if [ "$flagApplied" = "0" ]; then
-                ui_print "- WARNING: Can't apply for self-booting!"
-                ui_print "  Please check your device!"
-            fi
         ui_print "- Default mode: balance"
             if [ ! -f "/sdcard/wipe_mode" ]; then
                 echo "balance" > /sdcard/wipe_mode
