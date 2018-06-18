@@ -163,8 +163,8 @@ ui_print "- Platform: $platform"
             cat ./list_of_bootable | while read lineinText
             do 
                 fileFormat=`echo $lineinText | awk '{print \$1}'`
-                pathtofile=`echo $lineinText | awk '{print \$2}'`
-                pathinIMG=`echo $lineinText | awk '{print \$3}'`
+                pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
+                pathinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
                 case "$fileFormat" in
                 "[D]" )
                     if [ -d "$pathtofile" ]; then
