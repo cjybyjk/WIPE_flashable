@@ -82,30 +82,28 @@ lcasechar() {
 get_platform() {
     case "$1" in
         # Qualcomm Snapdragon
-        "msm8939" ) gplatform="sd_615_616";;
-        "msm8953" ) gplatform="sd_625_626";;
-        "sdm636" ) gplatform="sd_636";;
-        "msm8976" | "msm8956" ) gplatform="sd_652_650";;
-        "sdm660" ) gplatform="sd_660";;
-        "msm8974" | "apq8084" ) gplatform="sd_801_800_805";;
+        "msm8939" ) platform="sd_615_616";;
+        "msm8953" ) platform="sd_625_626";;
+        "sdm636" ) platform="sd_636";;
+        "msm8976" | "msm8956" ) platform="sd_652_650";;
+        "sdm660" ) platform="sd_660";;
+        "msm8974" | "apq8084" ) platform="sd_801_800_805";;
         "msm8994" | "msm8992" ) platform="sd_810_808";;
-        "msm8996" ) gplatform="sd_820_821";;
-        "msm8998" ) gplatform="sd_835";;
+        "msm8996" ) platform="sd_820_821";;
+        "msm8998" ) platform="sd_835";;
         # Mediatek
-        "mt6795" ) gplatform="helio_x10";;
-        "mt6797" ) gplatform="helio_x20_x25";;
+        "mt6795" ) platform="helio_x10";;
+        "mt6797" ) platform="helio_x20_x25";;
         # Intel Atom
-        "moorefield" ) gplatform="atom_z3560_z3580";;
+        "moorefield" ) platform="atom_z3560_z3580";;
         # Samsung Exynos
-        "universal8890" ) gplatform="exynos_8890";;
-        "universal8895" ) gplatform="exynos_8895";;
+        "universal8890" ) platform="exynos_8890";;
+        "universal8895" ) platform="exynos_8895";;
         # Hwawei Kirin
-        "hi3650" ) gplatform="kirin_950_955";;
-        "hi3660" ) gplatform="kirin_960";;
-        "hi3670" ) gplatform="kirin_970";;
+        "hi3650" ) platform="kirin_950_955";;
+        "hi3660" ) platform="kirin_960";;
+        "hi3670" ) platform="kirin_970";;
     esac
-    # use echo to replace return
-    echo $gplatform
 }
 
 # $1:file $2:add head
@@ -136,9 +134,9 @@ platform="unsupported"
 platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
 platformB=$(get_prop "ro.product.board")
 platformC=$(get_prop "ro.board.platform")
-platform=$(get_platform $platformA)
-platform=$(get_platform $platformB)
-platform=$(get_platform $platformC)
+get_platform $platformA
+get_platform $platformB
+get_platform $platformC
 
 ui_print "- Mounting /system and /data"
     remount_system_rw
