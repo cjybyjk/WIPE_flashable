@@ -80,6 +80,9 @@ lcasechar() {
 }
 
 get_platform() {
+    if [ ! "unsupported" = "$platform" ]; then
+        return 0
+    fi
     case "$1" in
         # Qualcomm Snapdragon
         "msm8939" ) platform="sd_615_616";;
@@ -131,12 +134,9 @@ ui_print "**************************"
 
 # get platform
 platform="unsupported"
-platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
-platformB=$(get_prop "ro.product.board")
-platformC=$(get_prop "ro.board.platform")
-get_platform $platformA
-get_platform $platformB
-get_platform $platformC
+get_platform $(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
+get_platform $(get_prop "ro.product.board")
+get_platform $(get_prop "ro.board.platform")
 
 ui_print "- Mounting /system and /data"
     remount_system_rw
