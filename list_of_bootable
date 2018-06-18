@@ -1,0 +1,13 @@
+#
+# List of bootable file/folder/img 
+# [I]:img [D]:folder [F]:file
+#
+
+[I] /data/magisk.img .core/service.d
+[I] /data/su.img su.d
+[D] /system/su.d/
+[D] /system/etc/init.d/
+[F] /system/etc/init.qcom.post_boot.sh
+[F] /system/etc/install-recovery.sh
+[F] /system/bin/sysinit
+[F] /system/bin/install-recovery.sh
