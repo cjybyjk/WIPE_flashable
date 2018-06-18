@@ -108,6 +108,17 @@ get_platform() {
     echo $platform
 }
 
+# $1:file $2:add head
+wipe_write() {
+    writefile=$1
+    if [ "$2" = "1" ]; then
+        echo "#!/system/bin/sh" > "$writefile"
+        chmod 0755 "$writefile"
+    fi
+    echo "# Project WIPE support" >> "$writefile"
+    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
+}
+
 OUTFD=$2
 ZIP=$3
 
@@ -138,10 +149,6 @@ ui_print "- Extracting files"
     cd /tmp/WIPE
     unzip -o "$ZIP"
 
-# list of folders allow to add / files allow to append if device unsupport init.d
-fileList=`cat ./appendable_file_list`
-folderList=`cat ./addable_folder_list`
-
 ui_print "- Platform: $platform"
     if [ -d "./platforms/$platform/" ]; then
         # Show notice when flashing
@@ -152,60 +159,59 @@ ui_print "- Platform: $platform"
         ui_print "- Copying files"
             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
             chmod 0755 /system/xbin/powercfg
-            if [ -f /data/magisk.img ]; then
-                ui_print "  Magisk Framework found, mounting magisk.img"
-                    mkdir ./magisk
-                    mount /data/magisk.img ./magisk
-                ui_print "  creating file on service.d..."
-                    echo "#!/system/bin/sh" > ./magisk/.core/service.d/99prjwipe
-                    echo "# Project WIPE support" >> ./magisk/.core/service.d/99prjwipe
-                    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> ./magisk/.core/service.d/99prjwipe
-                    chmod 0755 ./magisk/.core/service.d/99prjwipe
-                ui_print "Unmounting magisk.img"
-                    umount ./magisk
-            elif [ -f /data/su.img ]; then
-              ui_print "  SuperSU found, mounting magisk.img"
-                    mkdir ./supersu
-                    mount /data/su.img ./supersu
-                ui_print "  creating file on su.d..."
-                    echo "#!/system/bin/sh" > ./supersu/su.d/99prjwipe
-                    echo "# Project WIPE support" >> ./supersu/su.d/99prjwipe
-                    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> ./supersu/su.d/99prjwipe
-                    chmod 0755 ./supersu/su.d/99prjwipe
-                ui_print "  Unmounting su.img"
-                    umount ./supersu
-            else
-                appliedFlag=0
-                for folder in $folderList
-                do
-                    if [ -d "$folder" ]; then
-                        appliedFlag=1
-                        ui_print "  $folder found, creating file on it..."
-                            echo "#!/system/bin/sh" > $folder/99prjwipe
-                            echo "# Project WIPE support" >> $folder/99prjwipe
-                            echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> $folder/99prjwipe
-                            chmod 0755 $folder/99prjwipe
+            mkdir ./mountimg
+            # backup and set IFS
+            IFSBACKUP=$IFS
+            IFS=$(echo -en "\n")
+            flagApplied=0
+            for textinlist in `cat ./list_of_bootable`
+            do
+                fileFormat=`echo $textinlist | awk '{print \$1}'`
+                pathtofile=`echo $textinlist | awk '{print \$2}'`
+                pathinIMG=`echo $textinlist | awk '{print \$3}'`
+                case "$fileFormat" in
+                "[D]" )
+                    if [ -d "$pathtofile" ]; then
+                        flagApplied=1
+                        ui_print "  $pathtofile found, creating file on it..."
+                            wipe_write "$pathtofile/99prjwipe" 1
                         break
                     fi
-                done
-                if [ "$appliedFlag" = "0" ]; then
-                    for file in $fileList 
-                    do
-                        if [ -f "$file" ]; then
-                            # restore backup
-                            if [ -f "$file.wipebak" ]; then
-                                rm -f "$file"
-                                cp "$file.wipebak" "$file"
-                            else
-                                cp "$file" "$file.wipebak"
-                            fi
-                            ui_print "  $file found, adding lines to it..."
-                                echo "# Project WIPE support" >> $file
-                                echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> $file
-                            break
+                    ;;
+                "[F]" )
+                    if [ -f "$pathtofile" ]; then
+                        flagApplied=1
+                        # restore backup
+                        if [ -f "$pathtofile.wipebak" ]; then
+                            rm -f "$pathtofile"
+                            cp "$pathtofile.wipebak" "$pathtofile"
+                        else
+                            cp "$pathtofile" "$pathtofile.wipebak"
                         fi
-                    done
-                fi
+                        ui_print "  $pathtofile found, adding lines to it..."
+                            wipe_write "$pathtofile" 0
+                        break
+                    fi
+                    ;;
+                "[I]" )
+                    if [ -f "$pathtofile" ]; then
+                        flagApplied=1
+                        ui_print "  $pathtofile found, mounting..."
+                            mount "$pathtofile" ./mountimg
+                        ui_print "  creating file on $pathinIMG"
+                            wipe_write "./mountimg/$pathinIMG/99prjwipe" 1
+                        ui_print "Unmounting $pathtofile"
+                            umount ./mountimg
+                        break
+                    fi
+                    ;;
+                esac
+            done
+            # restore IFS
+            IFS=$IFSBACKUP
+            if [ "$flagApplied" = "0" ]; then
+                ui_print "- WARNING: Can't apply for self-booting!"
+                ui_print "  Please check your device!"
             fi
         ui_print "- Default mode: balance"
             if [ ! -f "/sdcard/wipe_mode" ]; then
