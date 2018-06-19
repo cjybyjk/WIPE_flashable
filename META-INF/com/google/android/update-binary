@@ -1,7 +1,10 @@
 #!/sbin/sh
-# auto-chosen script for flashing Project WIPE
+# Author: cjybyjk (cjybyjk@gmail.com)
+# script for removing Project WIPE
 # supported platform: any supported in Project WIPE
 
+OUTFD=$2
+ZIP=$3
 ui_print() {
     echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
     echo -n -e "ui_print\n" >> /proc/self/fd/$OUTFD
@@ -68,75 +71,14 @@ remount_system_rw() {
     if (! is_mounted /system rw); then toolbox_mount /system; fi
 }
 
-get_prop() {
-    # use echo to replace return
-    echo $(lcasechar `getprop "$1"`)
-}
-
-lcasechar() {
-    lowercase=$(echo $* | tr '[A-Z]' '[a-z]')
-    # use echo to replace return
-    echo $lowercase
-}
-
-get_platform() {
-    if [ ! "unsupported" = "$platform" ]; then
-        return 0
-    fi
-    case "$1" in
-        # Qualcomm Snapdragon
-        "msm8939" ) platform="sd_615_616";;
-        "msm8953" ) platform="sd_625_626";;
-        "sdm636" ) platform="sd_636";;
-        "msm8976" | "msm8956" ) platform="sd_652_650";;
-        "sdm660" ) platform="sd_660";;
-        "msm8974" | "apq8084" ) platform="sd_801_800_805";;
-        "msm8994" | "msm8992" ) platform="sd_810_808";;
-        "msm8996" ) platform="sd_820_821";;
-        "msm8998" ) platform="sd_835";;
-        # Mediatek
-        "mt6795" ) platform="helio_x10";;
-        "mt6797" ) platform="helio_x20_x25";;
-        # Intel Atom
-        "moorefield" ) platform="atom_z3560_z3580";;
-        # Samsung Exynos
-        "universal8890" ) platform="exynos_8890";;
-        "universal8895" ) platform="exynos_8895";;
-        # Hwawei Kirin
-        "hi3650" ) platform="kirin_950_955";;
-        "hi3660" ) platform="kirin_960";;
-        "hi3670" ) platform="kirin_970";;
-    esac
-}
-
-# $1:file $2:add head
-wipe_write() {
-    writefile=$1
-    if [ "$2" = "1" ]; then
-        echo "#!/system/bin/sh" > "$writefile"
-        chmod 0755 "$writefile"
-    fi
-    echo "# Project WIPE support" >> "$writefile"
-    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
-}
-
-OUTFD=$2
-ZIP=$3
-
 ui_print " "
 ui_print "**************************"
-ui_print "  Project WIPE installer"
+ui_print "  Project WIPE remover"
 ui_print "  Authors:"
 ui_print "  Project WIPE: yc9559"
 ui_print "  ZIP flashable: cjybyjk"
-ui_print "     Version: 180603"
 ui_print "**************************"
-
-# get platform
-platform="unsupported"
-get_platform $(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
-get_platform $(get_prop "ro.product.board")
-get_platform $(get_prop "ro.board.platform")
+ui_print " "
 
 ui_print "- Mounting /system and /data"
     remount_system_rw
@@ -147,67 +89,43 @@ ui_print "- Extracting files"
     cd /tmp/WIPE
     unzip -o "$ZIP"
 
-ui_print "- Platform: $platform"
-    if [ -d "./platforms/$platform/" ]; then
-        # Show notice when flashing
-        if [ -f "./platforms/$platform/NOTICE" ]; then
-            ui_print "- NOTICE:"
-            ui_print "  `cat ./platforms/$platform/NOTICE`"
-        fi
-        ui_print "- Copying files"
-            cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
-            chmod 0755 /system/xbin/powercfg
-            mkdir ./mountimg
-            cat ./list_of_bootable | while read lineinText
-            do 
-                fileFormat=`echo $lineinText | awk '{print \$1}'`
-                pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
-                pathinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
-                case "$fileFormat" in
-                "[D]" )
-                    if [ -d "$pathtofile" ]; then
-                        ui_print "  $pathtofile found, creating file on it..."
-                            wipe_write "$pathtofile/99prjwipe" 1
-                        break
-                    fi
-                    ;;
-                "[F]" )
-                    if [ -f "$pathtofile" ]; then
-                        # restore backup
-                        if [ -f "$pathtofile.wipebak" ]; then
-                            rm -f "$pathtofile"
-                            cp "$pathtofile.wipebak" "$pathtofile"
-                        else
-                            cp "$pathtofile" "$pathtofile.wipebak"
-                        fi
-                        ui_print "  $pathtofile found, adding lines to it..."
-                            wipe_write "$pathtofile" 0
-                        break
-                    fi
-                    ;;
-                "[I]" )
-                    if [ -f "$pathtofile" ]; then
-                        ui_print "  $pathtofile found, mounting..."
-                            mount "$pathtofile" ./mountimg
-                        ui_print "  creating file on $pathinIMG..."
-                            wipe_write "./mountimg/$pathinIMG/99prjwipe" 1
-                        ui_print "  Unmounting $pathtofile"
-                            umount ./mountimg
-                        break
-                    fi
-                    ;;
-                esac
-            done
-        ui_print "- Default mode: balance"
-            if [ ! -f "/sdcard/wipe_mode" ]; then
-                echo "balance" > /sdcard/wipe_mode
+ui_print "- Reomving files"
+    rm -f /system/xbin/powercfg
+    cat ./list_of_bootable | while read lineinText
+    do 
+        fileFormat=`echo $lineinText | awk '{print \$1}'`
+        pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
+        pathinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
+        case "$fileFormat" in
+        "[D]" )
+            if [ -d "$pathtofile" ]; then
+                ui_print "  $pathtofile found, deleting 99prjwipe"
+                    rm -f "$pathtofile/99prjwipe"
             fi
-            ui_print "- You can choose mode by using this two ways:"
-            ui_print "  1. Enter powercfg \$MODE in terminal"
-            ui_print "  2. Modify wipe_mode in your sdcard and reboot"
-    else
-        ui_print "- Unsupported device!"
-    fi
+            ;;
+        "[F]" )
+             if [ -f "$pathtofile" ]; then
+                # restore backup
+                if [ -f "$pathtofile.wipebak" ]; then
+                    ui_print "  restoring backup of $pathtofile"
+                    rm -f "$pathtofile"
+                    mv "$pathtofile.wipebak" "$pathtofile"
+                fi
+            fi
+            ;;
+        "[I]" )
+            if [ -f "$pathtofile" ]; then
+                ui_print "  $pathtofile found, mounting..."
+                    mount "$pathtofile" ./mountimg
+                ui_print "  removing file on $pathinIMG..."
+                    rm -f "./mountimg/$pathinIMG/99prjwipe" 1
+                ui_print "  Unmounting $pathtofile"
+                    umount ./mountimg
+            fi
+            ;;
+        esac
+    done
+    rm -f /sdcard/wipe_mode
 
 ui_print "- Cleaning files"
     cd /
