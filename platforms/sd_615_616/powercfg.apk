@@ -100,8 +100,8 @@ if [ ! -f /dev/project_wipe_runonce ]; then
 	set_value 3000000 /proc/sys/kernel/sched_freq_inc_notify
 
 	# avoid permission problem, do not set 0444
-	echo 2-3 > /dev/cpuset/background/cpus
-	echo 2-3 > /dev/cpuset/system-background/cpus
+	echo 6-7 > /dev/cpuset/background/cpus
+	echo 6-7 > /dev/cpuset/system-background/cpus
 	echo 0-3,4-7 > /dev/cpuset/foreground/cpus
 	echo 0-3,4-7 > /dev/cpuset/top-app/cpus
 
@@ -155,7 +155,7 @@ if [ "$action" = "balance" ]; then
 	set_param cpu4 above_hispeed_delay "98000 1113600:58000"
 	set_param cpu4 hispeed_freq 1113600
 	set_param cpu4 go_hispeed_load 97
-	set_param cpu4 target_loads "68 800000:60 998400:97 1113600:84"
+	set_param cpu4 target_loads "80 499200:68 800000:60 998400:97 1113600:84"
 	set_param cpu4 min_sample_time 58000
 fi
 
@@ -166,16 +166,16 @@ if [ "$action" = "performance" ]; then
 	set_param cpu0 go_hispeed_load 98
 	set_param cpu0 target_loads "80 800000:47 960000:52 1113600:63 1344000:98"
 	set_param cpu0 min_sample_time 18000
-    set_param cpu4 above_hispeed_delay "98000 998400:38000 1113600:78000"
+    set_param cpu4 above_hispeed_delay "98000 1113600:78000"
 	set_param cpu4 hispeed_freq 1113600
 	set_param cpu4 go_hispeed_load 96
-	set_param cpu4 target_loads "90 800000:57 960000:61 1113600:96 1344000:7"
+	set_param cpu4 target_loads "80 499200:90 800000:57 998400:61 1113600:7"
 	set_param cpu4 min_sample_time 78000
 fi
 
 if [ "$action" = "fast" ]; then
-    set_value 1344000 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-    set_value 998400 /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+	set_value 1344000 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+	set_value 1113600 /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
 	set_param cpu0 above_hispeed_delay "18000 1344000:198000"
 	set_param cpu4 above_hispeed_delay "18000 1113600:198000"
 	set_param cpu0 target_loads "80 1344000:90"
