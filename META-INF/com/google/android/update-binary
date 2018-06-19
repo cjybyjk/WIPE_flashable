@@ -118,7 +118,7 @@ ui_print "- Reomving files"
                 ui_print "  $pathtofile found, mounting..."
                     mount "$pathtofile" ./mountimg
                 ui_print "  removing file on $pathinIMG..."
-                    rm -f "./mountimg/$pathinIMG/99prjwipe" 1
+                    rm -f "./mountimg/$pathinIMG/99prjwipe"
                 ui_print "  Unmounting $pathtofile"
                     umount ./mountimg
             fi
