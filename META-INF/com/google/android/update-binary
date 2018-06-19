@@ -1,6 +1,10 @@
 #!/sbin/sh
+# Author: cjybyjk (cjybyjk@gmail.com)
 # auto-chosen script for flashing Project WIPE
 # supported platform: any supported in Project WIPE
+
+OUTFD=$2
+ZIP=$3
 
 ui_print() {
     echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
@@ -68,15 +72,15 @@ remount_system_rw() {
     if (! is_mounted /system rw); then toolbox_mount /system; fi
 }
 
-get_prop() {
-    # use echo to replace return
-    echo $(lcasechar `getprop "$1"`)
-}
-
 lcasechar() {
     lowercase=$(echo $* | tr '[A-Z]' '[a-z]')
     # use echo to replace return
     echo $lowercase
+}
+
+get_prop() {
+    # use echo to replace return
+    echo $(lcasechar `getprop "$1"`)
 }
 
 get_platform() {
@@ -120,9 +124,6 @@ wipe_write() {
     echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
 }
 
-OUTFD=$2
-ZIP=$3
-
 ui_print " "
 ui_print "**************************"
 ui_print "  Project WIPE installer"
@@ -131,6 +132,7 @@ ui_print "  Project WIPE: yc9559"
 ui_print "  ZIP flashable: cjybyjk"
 ui_print "     Version: 180603"
 ui_print "**************************"
+ui_print " "
 
 # get platform
 platform="unsupported"
