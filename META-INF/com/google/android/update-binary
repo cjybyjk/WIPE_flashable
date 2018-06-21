@@ -98,6 +98,7 @@ get_platform() {
         "msm8994" | "msm8992" ) platform="sd_810_808";;
         "msm8996" ) platform="sd_820_821";;
         "msm8998" ) platform="sd_835";;
+	"sdm845" ) platform="sd_845";;
         # Mediatek
         "mt6795" ) platform="helio_x10";;
         "mt6797" ) platform="helio_x20_x25";;
