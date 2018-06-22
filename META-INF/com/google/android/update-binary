@@ -6,9 +6,13 @@
 OUTFD=$2
 ZIP=$3
 
+# Detect whether in boot mode
+ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
+$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
+$BOOTMODE || id | grep -q 'uid=0' || BOOTMODE=true
+
 ui_print() {
-    echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
-    echo -n -e "ui_print\n" >> /proc/self/fd/$OUTFD
+  $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
 }
 
 is_mounted() {
@@ -122,7 +126,7 @@ wipe_write() {
         chmod 0755 "$writefile"
     fi
     echo "# Project WIPE support" >> "$writefile"
-    echo "/system/xbin/powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
+    echo "powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
 }
 
 ui_print " "
@@ -141,14 +145,19 @@ get_platform $(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
 get_platform $(get_prop "ro.product.board")
 get_platform $(get_prop "ro.board.platform")
 
-ui_print "- Mounting /system and /data"
-    remount_system_rw
-    toolbox_mount /data
+if [ ! $BOOTMODE ]; then
+    ui_print "- Mounting /system and /data"
+        remount_system_rw
+        toolbox_mount /data
+fi
 
 ui_print "- Extracting files"
-    mkdir /tmp/WIPE
+    if [ $BOOTMODE ]; then
+        mount -o rw,remount /
+    fi
+    mkdir -p /tmp/WIPE
     cd /tmp/WIPE
-    unzip -o "$ZIP"
+    unzip -o "$ZIP" > /dev/null
 
 ui_print "- Platform: $platform"
     if [ -d "./platforms/$platform/" ]; then
@@ -157,50 +166,80 @@ ui_print "- Platform: $platform"
             ui_print "- NOTICE:"
             ui_print "  `cat ./platforms/$platform/NOTICE`"
         fi
-        ui_print "- Copying files"
-            cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
-            chmod 0755 /system/xbin/powercfg
-            mkdir ./mountimg
-            cat ./list_of_bootable | while read lineinText
-            do 
-                fileFormat=`echo $lineinText | awk '{print \$1}'`
-                pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
-                pathinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
-                case "$fileFormat" in
-                "[D]" )
-                    if [ -d "$pathtofile" ]; then
-                        ui_print "  $pathtofile found, creating file on it..."
-                            wipe_write "$pathtofile/99prjwipe" 1
-                        break
-                    fi
-                    ;;
-                "[F]" )
-                    if [ -f "$pathtofile" ]; then
-                        # restore backup
-                        if [ -f "$pathtofile.wipebak" ]; then
-                            rm -f "$pathtofile"
-                            cp "$pathtofile.wipebak" "$pathtofile"
-                        else
-                            cp "$pathtofile" "$pathtofile.wipebak"
+        ui_print "- Installing..."
+            if [ ! -d "/data/adb/magisk/" ]; then
+                mkdir ./mountimg
+                while read lineinText
+                do 
+	                fileFormat=`echo $lineinText | awk '{print \$1}'`
+                    pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
+	                bootinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
+                    pathinIMG=`echo $lineinText | awk -F \" '{print \$6}'`
+                    case "$fileFormat" in
+                   "[D]" )
+                        if [ -d "$pathtofile" ]; then
+                            ui_print "  $pathtofile found, creating file on it..."
+                                wipe_write "$pathtofile/99prjwipe" 1
+                                flagBootApply=true
+                            ui_print "  copying powercfg to system/xbin"
+                                cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
+                                chmod 0755 /system/xbin/powercfg
+                            break
                         fi
-                        ui_print "  $pathtofile found, adding lines to it..."
-                            wipe_write "$pathtofile" 0
-                        break
-                    fi
                     ;;
-                "[I]" )
-                    if [ -f "$pathtofile" ]; then
-                        ui_print "  $pathtofile found, mounting..."
-                            mount "$pathtofile" ./mountimg
-                        ui_print "  creating file on $pathinIMG..."
-                            wipe_write "./mountimg/$pathinIMG/99prjwipe" 1
-                        ui_print "  Unmounting $pathtofile"
-                            umount ./mountimg
-                        break
-                    fi
+                    "[F]" )
+                        if [ -f "$pathtofile" ]; then
+                            # restore backup
+                            if [ -f "$pathtofile.wipebak" ]; then
+                                rm -f "$pathtofile"
+                                cp "$pathtofile.wipebak" "$pathtofile"
+                            else
+                                cp "$pathtofile" "$pathtofile.wipebak"
+                            fi
+                            ui_print "  $pathtofile found, adding lines to it..."
+                                wipe_write "$pathtofile" 0
+                                flagBootApply=true
+                            ui_print "  copying powercfg to system/xbin"
+                                cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
+                                chmod 0755 /system/xbin/powercfg
+                            break
+                        fi
                     ;;
-                esac
-            done
+                    "[I]" )
+                        if [ -f "$pathtofile" ]; then
+                            ui_print "  $pathtofile found, mounting..."
+                                mount "$pathtofile" ./mountimg
+                            if [ -d ./mountimg/$pathinIMG ]; then
+                                ui_print "  copying powercfg to $pathinIMG..."
+                                    cp ./platforms/$platform/powercfg.apk ./mountimg/pathinIMG/powercfg
+                                    chmod 0755  ./mountimg/pathinIMG/powercfg
+                            else
+                                ui_print "  copying powercfg to system/xbin"
+                                    cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
+                                    chmod 0755 /system/xbin/powercfg
+                            fi
+                            ui_print "  creating file on $bootinIMG..."
+                                wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
+                                flagBootApply=true
+                            ui_print "  Unmounting $pathtofile"
+                                umount ./mountimg
+                            break
+                        fi
+                    ;;
+                    esac
+                done < ./list_of_bootable
+                if [ ! $flagBootApply ]; then
+                    ui_print "- WARNING: No method to apply on boot!"
+                fi
+            else
+                ui_print "- Magisk Framework found, run install script"
+                    mkdir -p ./magisk/common/
+                    mkdir -p ./magisk/system/xbin/
+                    cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
+                    chmod 0755 ./magisk/system/xbin/powercfg
+                    wipe_write "./magisk/common/service.sh" 1
+                    sh ./magisk/magisk-script $1 $2 $3
+            fi
         ui_print "- Default mode: balance"
             if [ ! -f "/sdcard/wipe_mode" ]; then
                 echo "balance" > /sdcard/wipe_mode
@@ -215,8 +254,14 @@ ui_print "- Platform: $platform"
 ui_print "- Cleaning files"
     cd /
     rm -rf /tmp/WIPE
+    if [ $BOOTMODE ]; then
+        mount -o ro,remount /
+    fi
 
-ui_print "- Unmouting /system"
-    umount /system
+if [ ! $BOOTMODE ]; then
+    ui_print "- Unmouting /system"
+        umount /system
+fi
 
 ui_print "- Done!"
+exit 0
