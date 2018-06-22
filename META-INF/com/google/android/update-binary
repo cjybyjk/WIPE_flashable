@@ -219,6 +219,8 @@ ui_print "- Platform: $platform"
                 done
             else
                 ui_print "- Magisk Framework found, run install script"
+                    mkdir -p ./magisk/common/
+                    mkdir -p ./magisk/system/xbin/
                     cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
                     chmod 0755 ./magisk/system/xbin/powercfg
                     wipe_write "./magisk/common/service.sh" 1
