@@ -182,8 +182,9 @@ ui_print "- Platform: $platform"
                             ui_print "  $pathtofile found, creating file on it..."
                                 wipe_write "$pathtofile/99prjwipe" 1
                                 flagBootApply=true
-                            cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
-                            chmod 0755 /system/xbin/powercfg
+                            ui_print "  copying powercfg to system/xbin"
+                                cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
+                                chmod 0755 /system/xbin/powercfg
                             break
                         fi
                     ;;
@@ -199,8 +200,9 @@ ui_print "- Platform: $platform"
                             ui_print "  $pathtofile found, adding lines to it..."
                                 wipe_write "$pathtofile" 0
                                 flagBootApply=true
-                            cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
-                            chmod 0755 /system/xbin/powercfg
+                            ui_print "  copying powercfg to system/xbin"
+                                cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
+                                chmod 0755 /system/xbin/powercfg
                             break
                         fi
                     ;;
@@ -208,9 +210,15 @@ ui_print "- Platform: $platform"
                         if [ -f "$pathtofile" ]; then
                             ui_print "  $pathtofile found, mounting..."
                                 mount "$pathtofile" ./mountimg
+                            if [ -d ./mountimg/$pathinIMG ]; then
                                 ui_print "  copying powercfg to $pathinIMG..."
                                     cp ./platforms/$platform/powercfg.apk ./mountimg/pathinIMG/powercfg
                                     chmod 0755  ./mountimg/pathinIMG/powercfg
+                            else
+                                ui_print "  copying powercfg to system/xbin"
+                                    cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
+                                    chmod 0755 /system/xbin/powercfg
+                            fi
                             ui_print "  creating file on $bootinIMG..."
                                 wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
                                 flagBootApply=true
