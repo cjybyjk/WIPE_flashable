@@ -167,7 +167,7 @@ ui_print "- Platform: $platform"
             ui_print "  `cat ./platforms/$platform/NOTICE`"
         fi
         ui_print "- Installing..."
-            if [ ! -f "/data/magisk.img" ]; then
+            if [ ! -d "/data/adb/magisk" ]; then
                 mkdir ./mountimg
                 cat ./list_of_bootable | while read lineinText
                 do 
