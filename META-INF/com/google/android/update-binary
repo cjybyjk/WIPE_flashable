@@ -145,11 +145,9 @@ get_platform $(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
 get_platform $(get_prop "ro.product.board")
 get_platform $(get_prop "ro.board.platform")
 
-if [ ! $BOOTMODE ]; then
-    ui_print "- Mounting /system and /data"
-        remount_system_rw
-        toolbox_mount /data
-fi
+ui_print "- Mounting /system and /data"
+    remount_system_rw
+    toolbox_mount /data
 
 ui_print "- Extracting files"
     if [ $BOOTMODE ]; then
@@ -258,10 +256,8 @@ ui_print "- Cleaning files"
         mount -o ro,remount /
     fi
 
-if [ ! $BOOTMODE ]; then
-    ui_print "- Unmouting /system"
-        umount /system
-fi
+ui_print "- Unmouting /system"
+    umount /system
 
 ui_print "- Done!"
 exit 0
