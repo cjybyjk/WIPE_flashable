@@ -167,10 +167,9 @@ ui_print "- Platform: $platform"
             ui_print "  `cat ./platforms/$platform/NOTICE`"
         fi
         ui_print "- Installing..."
-            if [ ! -d "/data/adb/magisk" ]; then
-                flagBootApply=false
+            if [ ! -d "/data/adb/magisk/" ]; then
                 mkdir ./mountimg
-                cat ./list_of_bootable | while read lineinText
+                while read lineinText
                 do 
 	                fileFormat=`echo $lineinText | awk '{print \$1}'`
                     pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
@@ -228,9 +227,9 @@ ui_print "- Platform: $platform"
                         fi
                     ;;
                     esac
-                done
+                done < ./list_of_bootable
                 if [ ! $flagBootApply ]; then
-                    ui_print "WARNING: No method to apply on boot!"
+                    ui_print "- WARNING: No method to apply on boot!"
                 fi
             else
                 ui_print "- Magisk Framework found, run install script"
