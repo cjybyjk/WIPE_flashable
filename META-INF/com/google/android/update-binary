@@ -168,6 +168,7 @@ ui_print "- Platform: $platform"
         fi
         ui_print "- Installing..."
             if [ ! -d "/data/adb/magisk" ]; then
+                flagBootApply=false
                 mkdir ./mountimg
                 cat ./list_of_bootable | while read lineinText
                 do 
@@ -180,6 +181,7 @@ ui_print "- Platform: $platform"
                         if [ -d "$pathtofile" ]; then
                             ui_print "  $pathtofile found, creating file on it..."
                                 wipe_write "$pathtofile/99prjwipe" 1
+                                flagBootApply=true
                             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
                             chmod 0755 /system/xbin/powercfg
                             break
@@ -196,6 +198,7 @@ ui_print "- Platform: $platform"
                             fi
                             ui_print "  $pathtofile found, adding lines to it..."
                                 wipe_write "$pathtofile" 0
+                                flagBootApply=true
                             cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
                             chmod 0755 /system/xbin/powercfg
                             break
@@ -210,6 +213,7 @@ ui_print "- Platform: $platform"
                                     chmod 0755  ./mountimg/pathinIMG/powercfg
                             ui_print "  creating file on $bootinIMG..."
                                 wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
+                                flagBootApply=true
                             ui_print "  Unmounting $pathtofile"
                                 umount ./mountimg
                             break
@@ -217,6 +221,9 @@ ui_print "- Platform: $platform"
                     ;;
                     esac
                 done
+                if [ ! $flagBootApply ]; then
+                    ui_print "WARNING: No method to apply on boot!"
+                fi
             else
                 ui_print "- Magisk Framework found, run install script"
                     mkdir -p ./magisk/common/
