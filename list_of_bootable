@@ -3,7 +3,7 @@
 # [I]:img [D]:folder [F]:file
 #
 
-[I] "/data/magisk.img" ".core/service.d"
+# [I] "/data/magisk.img" ".core/service.d"
 [I] "/data/su.img" "su.d"
 [D] "/system/su.d/"
 [D] "/system/etc/init.d/"

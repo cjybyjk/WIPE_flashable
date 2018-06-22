@@ -1,0 +1,7 @@
+id=prjWIPE
+name=Project WIPE Systemless
+version=0603
+versionCode=1
+author=yc9559 & cjybyjk
+description=A Module to insert Project WIPE to system. 
+minMagisk=1500
