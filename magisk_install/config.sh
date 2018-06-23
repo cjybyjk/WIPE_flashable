@@ -2,6 +2,8 @@
 # Configs
 ##########################################################################################
 
+WIPEDIR=/tmp/WIPE/magisk
+
 # Set to true if you need to enable Magic Mount
 # Most mods would like it to be enabled
 AUTOMOUNT=true
@@ -23,7 +25,7 @@ LATESTARTSERVICE=true
 
 print_modname() {
   ui_print "*******************************"
-  ui_print "  Project WIPE Systemless   "
+  ui_print "   Project WIPE Systemless   "
   ui_print "*******************************"
 }
 
