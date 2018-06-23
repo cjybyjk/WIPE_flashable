@@ -10,8 +10,8 @@
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
-TMPDIR=/tmp/WIPE/magisk/temp
-INSTALLER=/tmp/WIPE/magisk
+TMPDIR=/dev/tmp
+INSTALLER=$TMPDIR/magisk_install
 MAGISKBIN=/data/adb/magisk
 
 # Default permissions
@@ -19,7 +19,7 @@ umask 022
 
 # Initial cleanup
 rm -rf $TMPDIR 2>/dev/null
-mkdir -p $TMPDIR
+mkdir -p $INSTALLER
 
 # echo before loading util_functions
 ui_print() { echo "$1"; }
@@ -70,7 +70,7 @@ $BOOTMODE && boot_actions || recovery_actions
 ##########################################################################################
 
 # Extract common files
-# unzip -o "$ZIP" module.prop config.sh 'common/*' -d $INSTALLER >&2
+unzip -o "$ZIP" 'magisk_install/*' -d $TMPDIR >&2
 
 [ ! -f $INSTALLER/config.sh ] && abort "! Unable to extract zip file!"
 # Load configurations
@@ -83,11 +83,11 @@ MODID=`grep_prop id $INSTALLER/module.prop`
 MODPATH=$MOUNTPATH/$MODID
 
 # Print mod name
-# print_modname
+print_modname
 
 # Please leave this message in your flashable zip for credits :)
 ui_print "******************************"
-ui_print "Powered by CubeSky (@wmliyin) "
+ui_print "Powered by Magisk (@topjohnwu)"
 ui_print "******************************"
 
 ##########################################################################################
@@ -106,8 +106,8 @@ mkdir -p $MODPATH
 
 # Extract files to system. Use your own method if needed
 ui_print "- Extracting module files"
-#unzip -o "$ZIP" 'system/*' -d $MODPATH >&2
-cp -R $INSTALLER/system $MODPATH/
+# unzip -o "$ZIP" 'system/*' -d $MODPATH >&2
+cp -R $WIPEDIR/* $MODPATH
 
 # Remove placeholder
 rm -f $MODPATH/system/placeholder 2>/dev/null
@@ -150,5 +150,5 @@ unmount_magisk_img
 $BOOTMODE || recovery_cleanup
 rm -rf $TMPDIR
 
-# ui_print "- Done"
+ui_print "- Done"
 exit 0

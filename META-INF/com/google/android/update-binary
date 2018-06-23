@@ -102,7 +102,7 @@ get_platform() {
         "msm8994" | "msm8992" ) platform="sd_810_808";;
         "msm8996" ) platform="sd_820_821";;
         "msm8998" ) platform="sd_835";;
-	"sdm845" ) platform="sd_845";;
+        "sdm845" ) platform="sd_845";;
         # Mediatek
         "mt6795" ) platform="helio_x10";;
         "mt6797" ) platform="helio_x20_x25";;
@@ -150,9 +150,6 @@ ui_print "- Mounting /system and /data"
     toolbox_mount /data
 
 ui_print "- Extracting files"
-    if [ $BOOTMODE ]; then
-        mount -o rw,remount /
-    fi
     mkdir -p /tmp/WIPE
     cd /tmp/WIPE
     unzip -o "$ZIP" > /dev/null
@@ -231,12 +228,10 @@ ui_print "- Platform: $platform"
                 fi
             else
                 ui_print "- Magisk Framework found, run install script"
-                    mkdir -p ./magisk/common/
                     mkdir -p ./magisk/system/xbin/
                     cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
                     chmod 0755 ./magisk/system/xbin/powercfg
-                    wipe_write "./magisk/common/service.sh" 1
-                    sh ./magisk/magisk-script $1 $2 $3
+                    sh ./magisk_install/magisk-script $1 $2 $3
             fi
         ui_print "- Default mode: balance"
             if [ ! -f "/sdcard/wipe_mode" ]; then
@@ -252,9 +247,6 @@ ui_print "- Platform: $platform"
 ui_print "- Cleaning files"
     cd /
     rm -rf /tmp/WIPE
-    if [ $BOOTMODE ]; then
-        mount -o ro,remount /
-    fi
 
 ui_print "- Unmouting /system"
     umount /system
