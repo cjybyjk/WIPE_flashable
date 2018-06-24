@@ -2,8 +2,6 @@
 # Configs
 ##########################################################################################
 
-WIPEDIR=/tmp/WIPE/magisk
-
 # Set to true if you need to enable Magic Mount
 # Most mods would like it to be enabled
 AUTOMOUNT=true

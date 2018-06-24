@@ -170,7 +170,7 @@ ui_print "- Platform: $platform"
                     mkdir -p ./magisk/system/xbin/
                     cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
                     chmod 0755 ./magisk/system/xbin/powercfg
-                    sh ./magisk_install/magisk-script $1 $2 $3
+                    sh ./magisk_install/magisk-script $1 $2 $3 $PWD
             fi
         ui_print "- Default mode: balance"
             if [ ! -f "/sdcard/wipe_mode" ]; then
