@@ -95,7 +95,8 @@ ui_print "- Reomving files"
     do 
         fileFormat=`echo $lineinText | awk '{print \$1}'`
         pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
-        pathinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
+        bootinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
+        pathinIMG=`echo $lineinText | awk -F \" '{print \$6}'`
         case "$fileFormat" in
         "[D]" )
             if [ -d "$pathtofile" ]; then
@@ -117,8 +118,10 @@ ui_print "- Reomving files"
             if [ -f "$pathtofile" ]; then
                 ui_print "  $pathtofile found, mounting..."
                     mount "$pathtofile" ./mountimg
-                ui_print "  removing file on $pathinIMG..."
-                    rm -f "./mountimg/$pathinIMG/99prjwipe"
+                ui_print "  removing file on $bootinIMG..."
+                    rm -f "./mountimg/$bootinIMG/99prjwipe"
+                ui_print "  removing powercfg on $pathinIMG..."
+                    rm -f "./mountimg/$pathinIMG/powercfg"
                 ui_print "  Unmounting $pathtofile"
                     umount ./mountimg
             fi
@@ -135,3 +138,4 @@ ui_print "- Unmouting /system"
     umount /system
 
 ui_print "- Done!"
+exit 0
