@@ -15,67 +15,6 @@ ui_print() {
   $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
 }
 
-is_mounted() {
-    if [ ! -z "$2" ]; then
-        cat /proc/mounts | grep $1 | grep $2, >/dev/null
-    else
-        cat /proc/mounts | grep $1 >/dev/null
-    fi
-    return $?
-}
-
-toolbox_mount() {
-    RW=rw
-    if [ ! -z "$2" ]; then
-        RW=$2
-    fi
-
-    DEV=
-    POINT=
-    FS=
-    for i in `cat /etc/fstab | grep "$1"`; do
-        if [ -z "$DEV" ]; then
-            DEV=$i
-        elif [ -z "$POINT" ]; then
-            POINT=$i
-        elif [ -z "$FS" ]; then
-            FS=$i
-            break
-        fi
-    done
-    if (! is_mounted $1 $RW); then mount -t $FS -o $RW $DEV $POINT; fi
-    if (! is_mounted $1 $RW); then mount -t $FS -o $RW,remount $DEV $POINT; fi
-
-    DEV=
-    POINT=
-    FS=
-    for i in `cat /etc/recovery.fstab | grep "$1"`; do
-        if [ -z "$POINT" ]; then
-            POINT=$i
-        elif [ -z "$FS" ]; then
-            FS=$i
-        elif [ -z "$DEV" ]; then
-            DEV=$i
-            break
-        fi
-    done
-    if [ "$FS" = "emmc" ]; then
-        if (! is_mounted $1 $RW); then mount -t ext4 -o $RW $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t ext4 -o $RW,remount $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t f2fs -o $RW $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t f2fs -o $RW,remount $DEV $POINT; fi
-    else
-        if (! is_mounted $1 $RW); then mount -t $FS -o $RW $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t $FS -o $RW,remount $DEV $POINT; fi
-    fi
-}
-
-remount_system_rw() {
-    if (! is_mounted /system rw); then mount -o rw,remount /system; fi
-    if (! is_mounted /system rw); then mount -o rw,remount /system /system; fi
-    if (! is_mounted /system rw); then toolbox_mount /system; fi
-}
-
 lcasechar() {
     lowercase=$(echo $* | tr '[A-Z]' '[a-z]')
     # use echo to replace return
@@ -146,8 +85,8 @@ get_platform $(get_prop "ro.product.board")
 get_platform $(get_prop "ro.board.platform")
 
 ui_print "- Mounting /system and /data"
-    remount_system_rw
-    toolbox_mount /data
+    mount /system
+    mount /data
 
 ui_print "- Extracting files"
     mkdir -p /tmp/WIPE
@@ -206,8 +145,8 @@ ui_print "- Platform: $platform"
                                 mount "$pathtofile" ./mountimg
                             if [ -d ./mountimg/$pathinIMG ]; then
                                 ui_print "  copying powercfg to $pathinIMG..."
-                                    cp ./platforms/$platform/powercfg.apk ./mountimg/pathinIMG/powercfg
-                                    chmod 0755  ./mountimg/pathinIMG/powercfg
+                                    cp ./platforms/$platform/powercfg.apk ./mountimg/$pathinIMG/powercfg
+                                    chmod 0755  ./mountimg/$pathinIMG/powercfg
                             else
                                 ui_print "  copying powercfg to system/xbin"
                                     cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
