@@ -84,8 +84,8 @@ chown 0.0 /sys/devices/system/cpu/cpu0/cpufreq/interactive/*
 chown 0.0 /sys/devices/system/cpu/cpu4/cpufreq/interactive/*
 chmod 0666 /sys/devices/system/cpu/cpu0/cpufreq/interactive/*
 chmod 0666 /sys/devices/system/cpu/cpu4/cpufreq/interactive/*
-set_value 380000 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-set_value 380000 /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+set_value 400000 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+set_value 400000 /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
 
 # RunOnce
 if [ ! -f /dev/project_wipe_runonce ]; then
@@ -108,8 +108,8 @@ if [ ! -f /dev/project_wipe_runonce ]; then
 	set_value 20 /sys/module/cpu_boost/parameters/input_boost_ms
 	set_value 0 /sys/module/msm_performance/parameters/touchboost
 
-	set_value 2 /sys/devices/system/cpu/cpu0/core_ctl/min_cpus
-	set_value 2 /sys/devices/system/cpu/cpu0/core_ctl/max_cpus
+	set_value 4 /sys/devices/system/cpu/cpu0/core_ctl/min_cpus
+	set_value 4 /sys/devices/system/cpu/cpu0/core_ctl/max_cpus
 
 	set_io cfq /sys/block/mmcblk0
 	set_io cfq /sys/block/sda
