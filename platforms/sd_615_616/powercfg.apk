@@ -108,10 +108,8 @@ if [ ! -f /dev/project_wipe_runonce ]; then
 	set_value 20 /sys/module/cpu_boost/parameters/input_boost_ms
 	set_value 0 /sys/module/msm_performance/parameters/touchboost
 
-	set_value 4 /sys/devices/system/cpu/cpu0/core_ctl/min_cpus
-	set_value 4 /sys/devices/system/cpu/cpu0/core_ctl/max_cpus
-	set_value 0 /sys/devices/system/cpu/cpu4/core_ctl/min_cpus
-	set_value 0 /sys/devices/system/cpu/cpu4/core_ctl/max_cpus
+	set_value 4 /sys/devices/system/cpu/cpu4/core_ctl/min_cpus
+	set_value 4 /sys/devices/system/cpu/cpu4/core_ctl/max_cpus
 
 	set_io cfq /sys/block/mmcblk0
 	set_io cfq /sys/block/sda
