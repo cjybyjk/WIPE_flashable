@@ -12,7 +12,12 @@ $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMO
 
 TMPDIR=/dev/tmp
 INSTALLER=$TMPDIR/magisk_install
-MAGISKBIN=/data/adb/magisk
+if [ -d /data/adb/magisk ]; then
+	MAGISKBIN=/data/adb/magisk
+elif [ ! -d /data/magisk ]; then
+	MAGISKBIN=/data/magisk
+fi
+
 WIPEDIR=$4/magisk
 
 # Default permissions
