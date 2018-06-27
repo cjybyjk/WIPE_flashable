@@ -11,6 +11,9 @@ ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 $BOOTMODE || id | grep -q 'uid=0' || BOOTMODE=true
 
+# Add Magisk busybox to PATH
+$BOOTMODE && export PATH="/sbin/.core/busybox:/dev/magisk/bin:$PATH"
+
 ui_print() {
 	$BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
 }
@@ -101,7 +104,7 @@ if [ -d "./platforms/$platform/" ]; then
 		ui_print "  `cat ./platforms/$platform/NOTICE`"
 	fi
 	ui_print "- Installing..."
-	if [ ! -d "/data/adb/magisk/" ]; then
+	if [ ! -d "/data/adb/magisk" ] && [ ! -d "/data/magisk" ]; then
 		mkdir ./mountimg
 		while read lineinText
 		do 
