@@ -71,6 +71,17 @@ wipe_write() {
 	echo "powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
 }
 
+w_post_boot_sh() {
+		POSTBOOTSH="$1/init.qcom.post_boot.sh"
+		if [ -f "/$POSTBOOTSH" ]; then
+			mkdir -p ./magisk/$1
+			cp /$POSTBOOTSH ./magisk/$POSTBOOTSH
+			if [ `grep -c "Project WIPE support" ./magisk/$POSTBOOTSH` -eq '0' ]; then
+				wipe_write "./magisk/$POSTBOOTSH" 0
+			fi
+		fi
+}
+
 ui_print " "
 ui_print "**************************"
 ui_print "  Project WIPE installer"
@@ -171,14 +182,9 @@ if [ -d "./platforms/$platform/" ]; then
 	else
 		ui_print "- Magisk Framework found, run install script"
 		mkdir -p ./magisk/system/xbin/
-		POSTBOOTSH="system/etc/init.qcom.post_boot.sh"
-		if [ -f "/$POSTBOOTSH" ]; then
-			mkdir -p ./magisk/system/etc
-			cp /$POSTBOOTSH ./magisk/$POSTBOOTSH
-			if [ `grep -c "Project WIPE support" ./magisk/$POSTBOOTSH` -eq '0' ]; then
-				wipe_write "./magisk/$POSTBOOTSH" 0
-			fi
-		fi
+		w_post_boot_sh "/system/etc"
+		w_post_boot_sh "/vendor/bin"
+		w_post_boot_sh "/vendor/etc"
 		cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
 		chmod 0755 ./magisk/system/xbin/powercfg
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD
