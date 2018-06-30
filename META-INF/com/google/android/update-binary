@@ -183,8 +183,7 @@ if [ -d "./platforms/$platform/" ]; then
 		ui_print "- Magisk Framework found, run install script"
 		mkdir -p ./magisk/system/xbin/
 		w_post_boot_sh "/system/etc"
-		w_post_boot_sh "/vendor/bin"
-		w_post_boot_sh "/vendor/etc"
+		w_post_boot_sh "/system/vendor/bin"
 		cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
 		chmod 0755 ./magisk/system/xbin/powercfg
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD
