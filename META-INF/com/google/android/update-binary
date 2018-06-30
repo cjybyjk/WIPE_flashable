@@ -68,7 +68,7 @@ wipe_write() {
 		chmod 0755 "$writefile"
 	fi
 	echo "# Project WIPE support" >> "$writefile"
-	echo "powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
+	echo "powercfg \`cat /data/media/0/wipe_mode\`" >> "$writefile"
 }
 
 w_post_boot_sh() {
@@ -189,8 +189,8 @@ if [ -d "./platforms/$platform/" ]; then
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD
 	fi
 	ui_print "- Default mode: balance"
-	if [ ! -f "/sdcard/wipe_mode" ]; then
-		echo "balance" > /sdcard/wipe_mode
+	if [ ! -f "/data/media/0/wipe_mode" ]; then
+		echo "balance" > /data/media/0/wipe_mode
 	fi
 	ui_print "- You can choose mode by using this two ways:"
 	ui_print "  1. Enter powercfg \$MODE in terminal"
