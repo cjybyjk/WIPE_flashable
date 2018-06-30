@@ -128,7 +128,7 @@ ui_print "- Reomving files"
             ;;
         esac
     done
-    rm -f /sdcard/wipe_mode
+    rm -f /data/media/0/wipe_mode
 
 ui_print "- Cleaning files"
     cd /
