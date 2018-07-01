@@ -94,9 +94,12 @@ ui_print " "
 
 # get platform
 platform="unsupported"
-get_platform $(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
-get_platform $(get_prop "ro.product.board")
-get_platform $(get_prop "ro.board.platform")
+platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
+platformB=$(get_prop "ro.product.board")
+platformC=$(get_prop "ro.board.platform")
+get_platform $platformA
+get_platform $platformB
+get_platform $platformC
 
 ui_print "- Mounting /system and /data"
 mount /system
@@ -197,6 +200,8 @@ if [ -d "./platforms/$platform/" ]; then
 	ui_print "  2. Modify wipe_mode in your sdcard and reboot"
 else
 	ui_print "! Unsupported device!"
+	ui_print "! Check this:"
+	ui_print "  Platform: $platformA $platformB $platformC"
 fi
 
 ui_print "- Cleaning files"
