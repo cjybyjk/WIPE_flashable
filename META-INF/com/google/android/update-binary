@@ -88,7 +88,7 @@ ui_print "  Project WIPE installer"
 ui_print "  Authors:"
 ui_print "  Project WIPE: yc9559"
 ui_print "  ZIP flashable: cjybyjk"
-ui_print "     Version: 0603.2"
+ui_print "     Version: 0603.1"
 ui_print "**************************"
 ui_print " "
 
