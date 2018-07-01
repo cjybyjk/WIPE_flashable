@@ -36,18 +36,18 @@ get_platform() {
 	case "$1" in
 		# Qualcomm Snapdragon
 		"msm8939" ) platform="sd_615_616";;
-		"msm8953" ) platform="sd_625_626";;
+		"msm8953" | "msm8953pro" ) platform="sd_625_626";;
 		"sdm636" ) platform="sd_636";;
 		"msm8976" | "msm8956" ) platform="sd_652_650";;
 		"sdm660" ) platform="sd_660";;
 		"msm8974" | "apq8084" ) platform="sd_801_800_805";;
 		"msm8994" | "msm8992" ) platform="sd_810_808";;
-		"msm8996" ) platform="sd_820_821";;
+		"msm8996" | "msm8996pro" ) platform="sd_820_821";;
 		"msm8998" ) platform="sd_835";;
 		"sdm845" ) platform="sd_845";;
 		# Mediatek
 		"mt6795" ) platform="helio_x10";;
-		"mt6797" ) platform="helio_x20_x25";;
+		"mt6797" | "mt6797t" ) platform="helio_x20_x25";;
 		# Intel Atom
 		"moorefield" ) platform="atom_z3560_z3580";;
 		# Samsung Exynos
@@ -94,9 +94,12 @@ ui_print " "
 
 # get platform
 platform="unsupported"
-get_platform $(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
-get_platform $(get_prop "ro.product.board")
-get_platform $(get_prop "ro.board.platform")
+platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
+platformB=$(get_prop "ro.product.board")
+platformC=$(get_prop "ro.board.platform")
+get_platform $platformA
+get_platform $platformB
+get_platform $platformC
 
 ui_print "- Mounting /system and /data"
 mount /system
@@ -197,6 +200,8 @@ if [ -d "./platforms/$platform/" ]; then
 	ui_print "  2. Modify wipe_mode in your sdcard and reboot"
 else
 	ui_print "! Unsupported device!"
+	ui_print "! Check this:"
+	ui_print "  Platform: $platformA $platformB $platformC"
 fi
 
 ui_print "- Cleaning files"
