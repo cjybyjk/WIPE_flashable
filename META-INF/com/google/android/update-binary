@@ -118,7 +118,14 @@ if [ -d "./platforms/$platform/" ]; then
 		ui_print "  `cat ./platforms/$platform/NOTICE`"
 	fi
 	ui_print "- Installing..."
-	if [ ! -d "/data/adb/magisk" ] && [ ! -d "/data/magisk" ]; then
+	ui_print "- Checking Magisk Framework"
+	magiskFlag=0
+	if [ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ];then
+		if [ ! -f "/system/vendor/bin/init.qcom.post_boot.sh" ]; then
+			magiskFlag=1
+		fi
+	fi
+	if [ $magiskFlag -eq 1 ]; then
 		mkdir ./mountimg
 		while read lineinText
 		do 
@@ -186,7 +193,7 @@ if [ -d "./platforms/$platform/" ]; then
 		ui_print "- Magisk Framework found, run install script"
 		mkdir -p ./magisk/system/xbin/
 		w_post_boot_sh "/system/etc"
-		w_post_boot_sh "/system/vendor/bin"
+		# w_post_boot_sh "/system/vendor/bin"
 		cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
 		chmod 0755 ./magisk/system/xbin/powercfg
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD
