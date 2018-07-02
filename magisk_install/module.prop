@@ -1,7 +1,7 @@
 id=prjWIPE
 name=Project WIPE Systemless
-version=w_0603.1,m_0702
-versionCode=070211
+version=w_0603.1,m_0703
+versionCode=070311
 author=yc9559 & cjybyjk @ coolapk
 description=A Module to insert Project WIPE 0603.1 to system. 
 minMagisk=1500
