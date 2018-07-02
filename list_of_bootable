@@ -4,7 +4,7 @@
 #
 
 # [I] "/data/magisk.img" ".core/service.d"
-[I] "/data/su.img" "su.d" "xbin"
+# [I] "/data/su.img" "su.d" "xbin"
 [F] "/system/etc/init.qcom.post_boot.sh"
 [F] "/system/vendor/bin/init.qcom.post_boot.sh"
 [D] "/system/su.d/"
