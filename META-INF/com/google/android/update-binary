@@ -68,7 +68,11 @@ wipe_write() {
 		chmod 0755 "$writefile"
 	fi
 	echo "# Project WIPE support" >> "$writefile"
-	echo "powercfg \`cat /data/media/0/wipe_mode\`" >> "$writefile"
+	echo "if [ -f '/sdcard/wipe_mode' ]; then" >> "$writefile"
+	echo "    powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
+	echo "else" >> "$writefile"
+	echo "    powercfg \`cat /data/media/0/wipe_mode\`" >> "$writefile"
+	echo "fi" >> "$writefile"
 }
 
 w_post_boot_sh() {
