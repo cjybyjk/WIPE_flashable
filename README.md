@@ -1,6 +1,8 @@
 # WIPE_flashable
 A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-opt) into your device
 
+### Version 0603.2
+
 ### Thanks to
 [@yc9559](https://github.com/yc9559)
 
@@ -16,16 +18,19 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
     (Open wipe_mode in your **internal storage** by using text editor.)
 -   修改其中的值，保存后重启
     (Change value on it,then save and reboot)
+###### ***可用的值 (Values available)*** :
+    powersave balance performance fast
+
 ##### 临时应用 (Temporary Apply)
 -   在终端以root身份执行命令
     (Run command as root in terminal): 
     ```shell
-    powercfg MODE
+    powercfg $MODE
     ```
--   MODE可以是这些值：
+-   $MODE可以是这些值：
     (MODE can be these values)
+
 ###### ***可用的值 (Values available)*** :
     powersave balance performance fast
-
 
 [下载卡刷包 (Download the flashable ZIP)](https://github.com/cjybyjk/WIPE_flashable/releases)
