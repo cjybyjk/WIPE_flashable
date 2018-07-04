@@ -205,8 +205,8 @@ if [ -d "./platforms/$platform/" ]; then
 	ui_print "- Linking powercfg to /data"
 	ln -s /system/xbin/powercfg /data/powercfg
 	ui_print "- Default mode: balance"
-	if [ ! -f "/data/media/0/wipe_mode" ]; then
-		echo "balance" > /data/media/0/wipe_mode
+	if [ ! -f "/sdcard/wipe_mode" ]; then
+		echo "balance" > /sdcard/wipe_mode
 	fi
 	ui_print "- You can choose mode by using this two ways:"
 	ui_print "  1. Enter powercfg \$MODE in terminal"
