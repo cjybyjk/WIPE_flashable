@@ -125,7 +125,7 @@ if [ -d "./platforms/$platform/" ]; then
 	ui_print "- Checking Magisk Framework"
 	magiskFlag=0
 	if [ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ]; then
-		if [ ! -f "/dev/block/bootdevice/by-name/vendor" ] || [ ! -f "/system/vendor/bin/init.qcom.post_boot.sh" ]; then
+		if [ `ls /dev/block/bootdevice/by-name/ | grep -c "vendor" ` -eq 0 ] || [ ! -f "/system/vendor/bin/init.qcom.post_boot.sh" ]; then
 			magiskFlag=1
 		fi
 	fi
