@@ -4,7 +4,6 @@
 #
 
 # [I] "/data/magisk.img" ".core/service.d"
-# [I] "/data/su.img" "su.d" "xbin"
 [F] "/system/etc/init.qcom.post_boot.sh"
 [F] "/system/vendor/bin/init.qcom.post_boot.sh"
 [D] "/system/su.d/"
@@ -13,3 +12,4 @@
 [F] "/system/etc/install-recovery.sh"
 [F] "/system/bin/sysinit"
 [F] "/system/bin/install-recovery.sh"
+[I] "/data/su.img" "su.d" "xbin"
