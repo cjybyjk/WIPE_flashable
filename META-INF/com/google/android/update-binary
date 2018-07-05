@@ -128,6 +128,21 @@ ui_print "- Reomving files"
             ;;
         esac
     done
+	ui_print " Checking Magisk Framework"
+	mkdir magisk
+	magiskFlag=false
+	if [ -f "/data/magisk.img" ]; then
+		mount /data/magisk.img magisk
+		magiskFlag=true
+	elif [ -f "/data/adb/magisk.img"]; then
+		mount /data/adb/magisk.img magisk
+		magiskFlag=true
+	fi
+	if [ magiskFlag ]; then
+		rm -rf magisk/prjWIPE
+		umount magisk
+	fi
+	
     rm -f /data/media/0/wipe_mode
 
 ui_print "- Cleaning files"
