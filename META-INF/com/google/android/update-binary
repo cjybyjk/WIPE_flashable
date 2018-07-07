@@ -11,9 +11,6 @@ ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 $BOOTMODE || id | grep -q 'uid=0' || BOOTMODE=true
 
-# Add Magisk busybox to PATH
-$BOOTMODE && export PATH="/sbin/.core/busybox:/dev/magisk/bin:$PATH"
-
 ui_print() {
 	$BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
 }
