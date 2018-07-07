@@ -182,7 +182,7 @@ if [ -d "./platforms/$platform/" ]; then
 				fi
 			;;
 			esac
-		done < ./list_of_bootable
+		done < ./common/list_of_bootable
 		if [ ! $flagBootApply ]; then
 			ui_print "! WARNING: No method to apply on boot!"
 		fi
