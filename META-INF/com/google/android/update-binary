@@ -119,6 +119,9 @@ if [ -d "./platforms/$platform/" ]; then
 	if [ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ]; then
 		magiskFlag=1
 	fi
+	if [ `ls /dev/block/bootdevice/by-name/ | grep -c "vendor" ` -ne 0 ] && [ -f "/system/vendor/bin/init.qcom.post_boot.sh" ]; then
+		magiskFlag=0
+	fi
 	if [ $magiskFlag -ne 1 ]; then
 		mkdir ./mountimg
 		while read lineinText
