@@ -64,14 +64,7 @@ wipe_write() {
 		echo "#!/system/bin/sh" > "$writefile"
 		chmod 0755 "$writefile"
 	fi
-	echo "# Project WIPE support" >> "$writefile"
-	echo "SEstatus=`getenforce`" >> "$writefile"
-	echo "if [ -f '/sdcard/wipe_mode' ]; then" >> "$writefile"
-	echo "    powercfg \`cat /sdcard/wipe_mode\`" >> "$writefile"
-	echo "else" >> "$writefile"
-	echo "    powercfg \`cat /data/media/0/wipe_mode\`" >> "$writefile"
-	echo "fi" >> "$writefile"
-	echo "setenforce $SEstatus" >> "$writefile"
+	cat ./common/runWIPE.sh >> "$writefile"
 }
 
 w_post_boot_sh() {
