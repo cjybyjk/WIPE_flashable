@@ -32,6 +32,7 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 	powercfg balance #平衡
 	powercfg performance #性能
 	powercfg fast #低延迟
+	powercfg restore #恢复系统调度(TESTING)
     ```
 
 [下载卡刷包 (Download the flashable ZIP)](https://github.com/cjybyjk/WIPE_flashable/releases)
