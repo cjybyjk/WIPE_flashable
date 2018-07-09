@@ -80,9 +80,10 @@ ui_print "  ZIP flashable: cjybyjk"
 ui_print "**************************"
 ui_print " "
 
-ui_print "- Mounting /system and /data"
+ui_print "- Mounting /system,/vendor and /data"
     remount_system_rw
     toolbox_mount /data
+    mount /vendor
 
 ui_print "- Extracting files"
     mkdir /tmp/WIPE
@@ -91,6 +92,8 @@ ui_print "- Extracting files"
 
 ui_print "- Reomving files"
     rm -f /system/xbin/powercfg
+	rm -f /system/bin/powercfg
+	rm -f /system/bin/powercfg_real
     cat ./list_of_bootable | while read lineinText
     do 
         fileFormat=`echo $lineinText | awk '{print \$1}'`
@@ -122,6 +125,7 @@ ui_print "- Reomving files"
                     rm -f "./mountimg/$bootinIMG/99prjwipe"
                 ui_print "  removing powercfg on $pathinIMG..."
                     rm -f "./mountimg/$pathinIMG/powercfg"
+					rm -f "./mountimg/$pathinIMG/powercf    g_real"
                 ui_print "  Unmounting $pathtofile"
                     umount ./mountimg
             fi
@@ -149,8 +153,9 @@ ui_print "- Cleaning files"
     cd /
     rm -rf /tmp/WIPE
 
-ui_print "- Unmouting /system"
+ui_print "- Unmouting /system and /vendor"
     umount /system
+	umount /vendor
 
 ui_print "- Done!"
 exit 0
