@@ -5,6 +5,7 @@
 
 OUTFD=$2
 ZIP=$3
+exitcode=0
 
 # Detect whether in boot mode
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
@@ -67,17 +68,6 @@ wipe_write() {
 	cat ./common/runWIPE.sh >> "$writefile"
 }
 
-w_post_boot_sh() {
-		POSTBOOTSH="$1/init.qcom.post_boot.sh"
-		if [ -f "/$POSTBOOTSH" ]; then
-			mkdir -p ./magisk/$1
-			cp /$POSTBOOTSH ./magisk/$POSTBOOTSH
-			if [ `grep -c "Project WIPE support" ./magisk/$POSTBOOTSH` -eq '0' ]; then
-				wipe_write "./magisk/$POSTBOOTSH" 0
-			fi
-		fi
-}
-
 ui_print " "
 ui_print "**************************"
 ui_print "  Project WIPE installer"
@@ -97,8 +87,9 @@ get_platform $platformA
 get_platform $platformB
 get_platform $platformC
 
-ui_print "- Mounting /system and /data"
+ui_print "- Mounting /system ,/vendor and /data"
 mount /system
+mount /vendor
 mount /data
 
 ui_print "- Extracting files"
@@ -119,9 +110,6 @@ if [ -d "./platforms/$platform/" ]; then
 	if [ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ]; then
 		magiskFlag=1
 	fi
-	if [ "true" = `getprop ro.treble.enable` ] && [ -f "/system/vendor/bin/init.qcom.post_boot.sh" ]; then
-		magiskFlag=0
-	fi
 	if [ $magiskFlag -ne 1 ]; then
 		mkdir ./mountimg
 		while read lineinText
@@ -136,9 +124,10 @@ if [ -d "./platforms/$platform/" ]; then
 					ui_print "  $pathtofile found, creating file on it..."
 					wipe_write "$pathtofile/99prjwipe" 1
 					flagBootApply=true
-					ui_print "  copying powercfg to system/xbin"
-					cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
-					chmod 0755 /system/xbin/powercfg
+					ui_print "  copying powercfg to system/bin"
+					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
+					cp ./common/powercfg /system/bin/powercfg
+					chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
 					break
 				fi
 			;;
@@ -154,9 +143,10 @@ if [ -d "./platforms/$platform/" ]; then
 					ui_print "  $pathtofile found, adding lines to it..."
 					wipe_write "$pathtofile" 0
 					flagBootApply=true
-					ui_print "  copying powercfg to system/xbin"
-					cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
-					chmod 0755 /system/xbin/powercfg
+					ui_print "  copying powercfg to system/bin"
+					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
+					cp ./common/powercfg /system/bin/powercfg
+					chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
 					break
 				fi
 			;;
@@ -166,12 +156,14 @@ if [ -d "./platforms/$platform/" ]; then
 					mount "$pathtofile" ./mountimg
 					if [ -d ./mountimg/$pathinIMG ]; then
 						ui_print "  copying powercfg to $pathinIMG..."
-						cp ./platforms/$platform/powercfg.apk ./mountimg/$pathinIMG/powercfg
-						chmod 0755  ./mountimg/$pathinIMG/powercfg
+						cp ./platforms/$platform/powercfg.apk ./mountimg/$pathinIMG/powercfg_real
+						cp ./common/powercfg ./mountimg/$pathinIMG/powercfg
+						chmod 0755  ./mountimg/$pathinIMG/powercfg ./mountimg/$pathinIMG/powercfg_real
 					else
-						ui_print "  copying powercfg to system/xbin"
-						cp ./platforms/$platform/powercfg.apk /system/xbin/powercfg
-						chmod 0755 /system/xbin/powercfg
+						ui_print "  copying powercfg to system/bin"
+						cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
+					    cp ./common/powercfg /system/bin/powercfg
+					    chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
 					fi
 					ui_print "  creating file on $bootinIMG..."
 					wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
@@ -187,16 +179,33 @@ if [ -d "./platforms/$platform/" ]; then
 			ui_print "! WARNING: No method to apply on boot!"
 		fi
 	else
-		ui_print "- Magisk Framework found, run install script"
-		mkdir -p ./magisk/system/xbin/
-		w_post_boot_sh "/system/etc"
-		w_post_boot_sh "/system/vendor/bin"
-		cp ./platforms/$platform/powercfg.apk ./magisk/system/xbin/powercfg
-		chmod 0755 ./magisk/system/xbin/powercfg
+		ui_print "- Magisk Framework found"
+		ui_print "  Copying files..."
+		mkdir -p ./magisk/system/bin/
+		cp ./common/list_of_magisk ./magisk/
+		while read pathtofile
+		do
+		    filepath=${pathtofile%/*}
+		    if [ -f "/$pathtofile" ]; then
+			    mkdir -p ./magisk/$filepath
+			    cp /$pathtofile ./magisk/$pathtofile
+			    if [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq '0' ]; then
+				    wipe_write "./magisk/$pathtofile" 0
+			    fi
+		    fi
+		done < ./common/list_of_magisk
+		cp ./platforms/$platform/powercfg.apk ./magisk/system/bin/powercfg_real
+		cp ./common/powercfg ./magisk/system/bin/powercfg
+		chmod 0755 ./magisk/system/bin/powercfg ./magisk/system/bin/powercfg_real
+		ui_print "  Running install script"
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD
+		exitcode=$?
+		if [ 0 -ne $exitcode ]; then
+		    ui_print "! WARNING: Magisk install script return $exitcode"
+		fi
 	fi
 	ui_print "- Linking powercfg to /data"
-	ln -s /system/xbin/powercfg /data/powercfg
+	ln -s /system/bin/powercfg /data/powercfg
 	ui_print "- Default mode: balance"
 	if [ ! -f "/sdcard/wipe_mode" ]; then
 		echo "balance" > /sdcard/wipe_mode
@@ -206,16 +215,18 @@ if [ -d "./platforms/$platform/" ]; then
 	ui_print "  2. Modify wipe_mode in your sdcard and reboot"
 else
 	ui_print "! Unsupported device!"
-	ui_print "! Check this:"
+	ui_print "  Please check this:"
 	ui_print "  Platform: $platformA $platformB $platformC"
+	exitcode=1
 fi
 
 ui_print "- Cleaning files"
 cd /
 rm -rf /tmp/WIPE
 
-ui_print "- Unmouting /system"
+ui_print "- Unmouting /system ,/vendor"
 umount /system
+umount /vendor
 
 ui_print "- Done!"
-exit 0
+exit $exitcode
