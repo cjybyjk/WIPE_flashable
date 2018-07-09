@@ -59,7 +59,8 @@ set_permissions() {
 
   # The following is default permissions, DO NOT remove
   set_perm_recursive  $MODPATH  0  0  0755  0644
-  set_perm  $MODPATH/system/xbin/powercfg       0       0       0755
+  set_perm  $MODPATH/system/bin/powercfg 0 0 0755
+  set_perm  $MODPATH/system/bin/powercfg_real 0 0 0755
 }
 
 ##########################################################################################
