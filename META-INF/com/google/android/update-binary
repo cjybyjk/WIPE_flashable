@@ -87,7 +87,7 @@ get_platform $platformA
 get_platform $platformB
 get_platform $platformC
 
-ui_print "- Mounting /system ,/vendor and /data"
+ui_print "- Mounting /system,/vendor and /data"
 mount /system
 mount /vendor
 mount /data
@@ -98,7 +98,7 @@ cd /tmp/WIPE
 unzip -o "$ZIP" > /dev/null
 
 ui_print "- Platform: $platform"
-if [ -d "./platforms/$platform/" ]; then
+if [ -f "./platforms/$platform/powercfg.apk" ]; then
 	# Show notice when flashing
 	if [ -f "./platforms/$platform/NOTICE" ]; then
 		ui_print "- NOTICE:"
@@ -192,7 +192,7 @@ if [ -d "./platforms/$platform/" ]; then
 		    if [ -f "/$pathtofile" ]; then
 			    mkdir -p ./magisk/$filepath
 			    cp /$pathtofile ./magisk/$pathtofile
-			    if [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq '0' ]; then
+			    if [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq 0 ]; then
 				    wipe_write "./magisk/$pathtofile" 0
 			    fi
 		    fi
@@ -227,7 +227,7 @@ ui_print "- Cleaning files"
 cd /
 rm -rf /tmp/WIPE
 
-ui_print "- Unmouting /system ,/vendor"
+ui_print "- Unmouting /system,/vendor"
 umount /system
 umount /vendor
 
