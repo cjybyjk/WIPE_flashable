@@ -78,6 +78,8 @@ ui_print "     Version: 0603.2"
 ui_print "**************************"
 ui_print " "
 
+TMPDIR=/dev/tmp/WIPE
+
 # get platform
 platform="unsupported"
 platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
@@ -87,14 +89,14 @@ get_platform $platformA
 get_platform $platformB
 get_platform $platformC
 
-ui_print "- Mounting /system,/vendor and /data"
+ui_print "- Mounting /system, /vendor and /data"
 mount /system
 mount /vendor
 mount /data
 
 ui_print "- Extracting files"
-mkdir -p /tmp/WIPE
-cd /tmp/WIPE
+mkdir -p $TMPDIR
+cd $TMPDIR
 unzip -o "$ZIP" > /dev/null
 
 ui_print "- Platform: $platform"
@@ -222,9 +224,9 @@ fi
 
 ui_print "- Cleaning files"
 cd /
-rm -rf /tmp/WIPE
+rm -rf $TMPDIR
 
-ui_print "- Unmouting /system,/vendor"
+ui_print "- Unmouting /system, /vendor"
 umount /system
 umount /vendor
 
