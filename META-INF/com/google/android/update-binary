@@ -128,9 +128,8 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 					wipe_write "$pathtofile/99prjwipe" 1
 					flagBootApply=true
 					ui_print "  copying powercfg to system/bin"
-					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
-					cp ./common/powercfg /system/bin/powercfg
-					chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
+					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
+					chmod 0755 /system/bin/powercfg
 					break
 				fi
 			;;
@@ -147,9 +146,8 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 					wipe_write "$pathtofile" 0
 					flagBootApply=true
 					ui_print "  copying powercfg to system/bin"
-					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
-					cp ./common/powercfg /system/bin/powercfg
-					chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
+					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
+					chmod 0755 /system/bin/powercfg
 					break
 				fi
 			;;
@@ -159,14 +157,12 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 					mount "$pathtofile" ./mountimg
 					if [ -d ./mountimg/$pathinIMG ]; then
 						ui_print "  copying powercfg to $pathinIMG..."
-						cp ./platforms/$platform/powercfg.apk ./mountimg/$pathinIMG/powercfg_real
-						cp ./common/powercfg ./mountimg/$pathinIMG/powercfg
-						chmod 0755  ./mountimg/$pathinIMG/powercfg ./mountimg/$pathinIMG/powercfg_real
+						cp ./platforms/$platform/powercfg.apk ./mountimg/$pathinIMG/powercfg
+						chmod 0755  ./mountimg/$pathinIMG/powercfg
 					else
 						ui_print "  copying powercfg to system/bin"
-						cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
-					    cp ./common/powercfg /system/bin/powercfg
-					    chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
+						cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
+					    chmod 0755 /system/bin/powercfg
 					fi
 					ui_print "  creating file on $bootinIMG..."
 					wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
@@ -197,9 +193,7 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 			    fi
 		    fi
 		done < ./common/list_of_magisk
-		cp ./platforms/$platform/powercfg.apk ./magisk/system/bin/powercfg_real
-		cp ./common/powercfg ./magisk/system/bin/powercfg
-		chmod 0755 ./magisk/system/bin/powercfg ./magisk/system/bin/powercfg_real
+		cp ./platforms/$platform/powercfg.apk ./magisk/system/bin/powercfg
 		ui_print "  Running install script"
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD
 		exitcode=$?
