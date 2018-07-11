@@ -202,6 +202,9 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 		fi
 	fi
 	ui_print "- Linking powercfg to /data"
+	if [ -L "/data/powercfg" ]; then
+		rm /data/powercfg
+	fi
 	ln -s /system/bin/powercfg /data/powercfg
 	ui_print "- Default mode: balance"
 	if [ ! -f "/sdcard/wipe_mode" ]; then
