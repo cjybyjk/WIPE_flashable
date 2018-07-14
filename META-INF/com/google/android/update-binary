@@ -49,6 +49,7 @@ get_platform() {
 		# Intel Atom
 		"moorefield" ) platform="atom_z3560_z3580";;
 		# Samsung Exynos
+		"universal7420" ) platform="exynos_7420";;
 		"universal8890" ) platform="exynos_8890";;
 		"universal8895" ) platform="exynos_8895";;
 		# Hwawei Kirin
