@@ -5,70 +5,14 @@
 
 OUTFD=$2
 ZIP=$3
+
+# Detect whether in boot mode
+ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
+$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
+$BOOTMODE || id | grep -q 'uid=0' || BOOTMODE=true
+
 ui_print() {
-    echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
-    echo -n -e "ui_print\n" >> /proc/self/fd/$OUTFD
-}
-
-is_mounted() {
-    if [ ! -z "$2" ]; then
-        cat /proc/mounts | grep $1 | grep $2, >/dev/null
-    else
-        cat /proc/mounts | grep $1 >/dev/null
-    fi
-    return $?
-}
-
-toolbox_mount() {
-    RW=rw
-    if [ ! -z "$2" ]; then
-        RW=$2
-    fi
-
-    DEV=
-    POINT=
-    FS=
-    for i in `cat /etc/fstab | grep "$1"`; do
-        if [ -z "$DEV" ]; then
-            DEV=$i
-        elif [ -z "$POINT" ]; then
-            POINT=$i
-        elif [ -z "$FS" ]; then
-            FS=$i
-            break
-        fi
-    done
-    if (! is_mounted $1 $RW); then mount -t $FS -o $RW $DEV $POINT; fi
-    if (! is_mounted $1 $RW); then mount -t $FS -o $RW,remount $DEV $POINT; fi
-
-    DEV=
-    POINT=
-    FS=
-    for i in `cat /etc/recovery.fstab | grep "$1"`; do
-        if [ -z "$POINT" ]; then
-            POINT=$i
-        elif [ -z "$FS" ]; then
-            FS=$i
-        elif [ -z "$DEV" ]; then
-            DEV=$i
-            break
-        fi
-    done
-    if [ "$FS" = "emmc" ]; then
-        if (! is_mounted $1 $RW); then mount -t ext4 -o $RW $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t ext4 -o $RW,remount $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t f2fs -o $RW $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t f2fs -o $RW,remount $DEV $POINT; fi
-    else
-        if (! is_mounted $1 $RW); then mount -t $FS -o $RW $DEV $POINT; fi
-        if (! is_mounted $1 $RW); then mount -t $FS -o $RW,remount $DEV $POINT; fi
-    fi
-}
-
-remount_system_rw() {
-    if (! is_mounted /system rw); then mount -o rw,remount /system; fi
-    if (! is_mounted /system rw); then mount -o rw,remount /system /system; fi
-    if (! is_mounted /system rw); then toolbox_mount /system; fi
+	$BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
 }
 
 ui_print " "
@@ -80,82 +24,90 @@ ui_print "  ZIP flashable: cjybyjk"
 ui_print "**************************"
 ui_print " "
 
-ui_print "- Mounting /system,/vendor and /data"
-    remount_system_rw
-    toolbox_mount /data
-    mount /vendor
+TMPDIR=/dev/tmp_WIPE
+
+ui_print "- Mounting /system, /vendor and /data"
+mount /system
+mount /vendor
+mount /data
 
 ui_print "- Extracting files"
-    mkdir /tmp/WIPE
-    cd /tmp/WIPE
-    unzip -o "$ZIP"
+mkdir -p $TMPDIR
+cd $TMPDIR
+unzip -o "$ZIP" > /dev/null
 
 ui_print "- Reomving files"
-    rm -f /system/xbin/powercfg
-	rm -f /system/bin/powercfg
-	rm -f /system/bin/powercfg_real
-    cat ./list_of_bootable | while read lineinText
-    do 
-        fileFormat=`echo $lineinText | awk '{print \$1}'`
-        pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
-        bootinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
-        pathinIMG=`echo $lineinText | awk -F \" '{print \$6}'`
-        case "$fileFormat" in
-        "[D]" )
-            if [ -d "$pathtofile" ]; then
-                ui_print "  $pathtofile found, deleting 99prjwipe"
-                    rm -f "$pathtofile/99prjwipe"
+rm -f /system/xbin/powercfg
+rm -f /system/bin/powercfg
+rm -f /system/bin/powercfg_real
+mkdir ./mountimg
+while read lineinText
+do 
+    fileFormat=`echo $lineinText | awk '{print \$1}'`
+    pathtofile=`echo $lineinText | awk -F \" '{print \$2}'`
+    bootinIMG=`echo $lineinText | awk -F \" '{print \$4}'`
+    pathinIMG=`echo $lineinText | awk -F \" '{print \$6}'`
+    case "$fileFormat" in
+    "[D]" )
+        if [ -d "$pathtofile" ]; then
+            ui_print "  $pathtofile found, removing files..."
+            rm -f "$pathtofile/99prjwipe"
+        fi
+    ;;
+    "[F]" )
+        if [ -f "$pathtofile" ]; then
+            # restore backup
+            if [ -f "$pathtofile.wipebak" ]; then
+                ui_print "  backup of $pathtofile found,restoring"
+                rm -f "$pathtofile"
+                mv "$pathtofile.wipebak" "$pathtofile"
             fi
-            ;;
-        "[F]" )
-             if [ -f "$pathtofile" ]; then
-                # restore backup
-                if [ -f "$pathtofile.wipebak" ]; then
-                    ui_print "  restoring backup of $pathtofile"
-                    rm -f "$pathtofile"
-                    mv "$pathtofile.wipebak" "$pathtofile"
-                fi
+        fi
+    ;;
+    "[I]" )
+        if [ -f "$pathtofile" ]; then
+            ui_print "  $pathtofile found, mounting..."
+            mount "$pathtofile" ./mountimg
+            if [ -d ./mountimg/$pathinIMG ]; then
+                ui_print "  removing powercfg to $pathinIMG..."
+                rm ./mountimg/$pathinIMG/powercfg
+                rm ./mountimg/$pathinIMG/powercfg_real
             fi
-            ;;
-        "[I]" )
-            if [ -f "$pathtofile" ]; then
-                ui_print "  $pathtofile found, mounting..."
-                    mount "$pathtofile" ./mountimg
-                ui_print "  removing file on $bootinIMG..."
-                    rm -f "./mountimg/$bootinIMG/99prjwipe"
-                ui_print "  removing powercfg on $pathinIMG..."
-                    rm -f "./mountimg/$pathinIMG/powercfg"
-					rm -f "./mountimg/$pathinIMG/powercf    g_real"
-                ui_print "  Unmounting $pathtofile"
-                    umount ./mountimg
-            fi
-            ;;
-        esac
-    done
-	ui_print " Checking Magisk Framework"
-	mkdir magisk
-	magiskFlag=false
-	if [ -f "/data/magisk.img" ]; then
-		mount /data/magisk.img magisk
-		magiskFlag=true
-	elif [ -f "/data/adb/magisk.img"]; then
-		mount /data/adb/magisk.img magisk
-		magiskFlag=true
-	fi
-	if [ magiskFlag ]; then
-		rm -rf magisk/prjWIPE
-		umount magisk
-	fi
-	
-    rm -f /data/media/0/wipe_mode
+            ui_print "  removing file on $bootinIMG..."
+            rm -f "./mountimg/$bootinIMG/99prjwipe"
+            ui_print "  Unmounting $pathtofile"
+            umount ./mountimg
+        fi
+    ;;
+    esac
+done < ./list_of_bootable
+ui_print "  Mounting magisk.img"
+mkdir magisk
+magiskFlag=false
+if [ -f "/data/magisk.img" ]; then
+    mount /data/magisk.img magisk
+elif [ -f "/data/adb/magisk.img"]; then
+    mount /data/adb/magisk.img magisk
+fi
+ui_print "  Removing magisk module (id:prjWIPE)"
+rm -rf magisk/prjWIPE
+umount magisk
+
+ui_print "  Removing wipe_mode"
+rm -f /sdcard/wipe_mode
+
+if [ -L "/data/powercfg" ]; then
+    ui_print "  Removing powercfg (symbol link) on /data"
+    rm /data/powercfg
+fi
 
 ui_print "- Cleaning files"
-    cd /
-    rm -rf /tmp/WIPE
+cd /
+rm -rf $TMPDIR
 
-ui_print "- Unmouting /system and /vendor"
-    umount /system
-	umount /vendor
+ui_print "- Unmouting /system, /vendor"
+umount /system
+umount /vendor
 
 ui_print "- Done!"
 exit 0
