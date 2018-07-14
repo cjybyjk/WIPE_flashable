@@ -49,6 +49,7 @@ get_platform() {
 		# Intel Atom
 		"moorefield" ) platform="atom_z3560_z3580";;
 		# Samsung Exynos
+		"universal7420" ) platform="exynos_7420";;
 		"universal8890" ) platform="exynos_8890";;
 		"universal8895" ) platform="exynos_8895";;
 		# Hwawei Kirin
@@ -78,6 +79,8 @@ ui_print "     Version: 0603.2"
 ui_print "**************************"
 ui_print " "
 
+TMPDIR=/dev/tmp_WIPE
+
 # get platform
 platform="unsupported"
 platformA=$(lcasechar `grep "Hardware" /proc/cpuinfo | awk '{print \$NF}'`)
@@ -87,18 +90,18 @@ get_platform $platformA
 get_platform $platformB
 get_platform $platformC
 
-ui_print "- Mounting /system ,/vendor and /data"
+ui_print "- Mounting /system, /vendor and /data"
 mount /system
 mount /vendor
 mount /data
 
 ui_print "- Extracting files"
-mkdir -p /tmp/WIPE
-cd /tmp/WIPE
+mkdir -p $TMPDIR
+cd $TMPDIR
 unzip -o "$ZIP" > /dev/null
 
 ui_print "- Platform: $platform"
-if [ -d "./platforms/$platform/" ]; then
+if [ -f "./platforms/$platform/powercfg.apk" ]; then
 	# Show notice when flashing
 	if [ -f "./platforms/$platform/NOTICE" ]; then
 		ui_print "- NOTICE:"
@@ -128,9 +131,8 @@ if [ -d "./platforms/$platform/" ]; then
 					wipe_write "$pathtofile/99prjwipe" 1
 					flagBootApply=true
 					ui_print "  copying powercfg to system/bin"
-					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
-					cp ./common/powercfg /system/bin/powercfg
-					chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
+					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
+					chmod 0755 /system/bin/powercfg
 					break
 				fi
 			;;
@@ -147,9 +149,8 @@ if [ -d "./platforms/$platform/" ]; then
 					wipe_write "$pathtofile" 0
 					flagBootApply=true
 					ui_print "  copying powercfg to system/bin"
-					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
-					cp ./common/powercfg /system/bin/powercfg
-					chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
+					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
+					chmod 0755 /system/bin/powercfg
 					break
 				fi
 			;;
@@ -159,14 +160,12 @@ if [ -d "./platforms/$platform/" ]; then
 					mount "$pathtofile" ./mountimg
 					if [ -d ./mountimg/$pathinIMG ]; then
 						ui_print "  copying powercfg to $pathinIMG..."
-						cp ./platforms/$platform/powercfg.apk ./mountimg/$pathinIMG/powercfg_real
-						cp ./common/powercfg ./mountimg/$pathinIMG/powercfg
-						chmod 0755  ./mountimg/$pathinIMG/powercfg ./mountimg/$pathinIMG/powercfg_real
+						cp ./platforms/$platform/powercfg.apk ./mountimg/$pathinIMG/powercfg
+						chmod 0755  ./mountimg/$pathinIMG/powercfg
 					else
 						ui_print "  copying powercfg to system/bin"
-						cp ./platforms/$platform/powercfg.apk /system/bin/powercfg_real
-					    cp ./common/powercfg /system/bin/powercfg
-					    chmod 0755 /system/bin/powercfg /system/bin/powercfg_real
+						cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
+					    chmod 0755 /system/bin/powercfg
 					fi
 					ui_print "  creating file on $bootinIMG..."
 					wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
@@ -192,14 +191,12 @@ if [ -d "./platforms/$platform/" ]; then
 		    if [ -f "/$pathtofile" ]; then
 			    mkdir -p ./magisk/$filepath
 			    cp /$pathtofile ./magisk/$pathtofile
-			    if [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq '0' ]; then
+			    if [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq 0 ]; then
 				    wipe_write "./magisk/$pathtofile" 0
 			    fi
 		    fi
 		done < ./common/list_of_magisk
-		cp ./platforms/$platform/powercfg.apk ./magisk/system/bin/powercfg_real
-		cp ./common/powercfg ./magisk/system/bin/powercfg
-		chmod 0755 ./magisk/system/bin/powercfg ./magisk/system/bin/powercfg_real
+		cp ./platforms/$platform/powercfg.apk ./magisk/system/bin/powercfg
 		ui_print "  Running install script"
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD
 		exitcode=$?
@@ -208,6 +205,9 @@ if [ -d "./platforms/$platform/" ]; then
 		fi
 	fi
 	ui_print "- Linking powercfg to /data"
+	if [ -L "/data/powercfg" ]; then
+		rm /data/powercfg
+	fi
 	ln -s /system/bin/powercfg /data/powercfg
 	ui_print "- Default mode: balance"
 	if [ ! -f "/sdcard/wipe_mode" ]; then
@@ -225,9 +225,9 @@ fi
 
 ui_print "- Cleaning files"
 cd /
-rm -rf /tmp/WIPE
+rm -rf $TMPDIR
 
-ui_print "- Unmouting /system ,/vendor"
+ui_print "- Unmouting /system, /vendor"
 umount /system
 umount /vendor
 
