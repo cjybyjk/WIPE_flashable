@@ -110,12 +110,8 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 	ui_print "- Installing..."
 	ui_print "- Checking Magisk Framework"
 	magiskFlag=0
-	if [ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ]; then
-		magiskFlag=1
-	fi
-	if [ -f /wipe_nomagisk ]; then
-	    magiskFlag=0
-    fi
+	[ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ] && magiskFlag=1
+	[ -f /wipe_nomagisk ] &&  magiskFlag=0
 	if [ $magiskFlag -ne 1 ]; then
 		mkdir ./mountimg
 		while read lineinText
@@ -177,9 +173,7 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 			;;
 			esac
 		done < ./common/list_of_bootable
-		if [ ! $flagBootApply ]; then
-			ui_print "! WARNING: No method to apply on boot!"
-		fi
+		[ ! $flagBootApply ] && ui_print "! WARNING: No method to apply on boot!"
 	else
 		ui_print "- Magisk Framework found"
 		ui_print "  Copying files..."
@@ -191,9 +185,7 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 		    if [ -f "/$pathtofile" ]; then
 			    mkdir -p ./magisk/$filepath
 			    cp /$pathtofile ./magisk/$pathtofile
-			    if [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq 0 ]; then
-				    wipe_write "./magisk/$pathtofile" 0
-			    fi
+			    [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq 0 ] && wipe_write "./magisk/$pathtofile" 0
 		    fi
 		done < ./common/list_of_magisk
 		cp ./platforms/$platform/powercfg.apk ./magisk/system/bin/powercfg
@@ -205,14 +197,10 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 		fi
 	fi
 	ui_print "- Linking powercfg to /data"
-	if [ -L "/data/powercfg" ]; then
-		rm /data/powercfg
-	fi
+	[ -L "/data/powercfg" ] && rm /data/powercfg
 	ln -s /system/bin/powercfg /data/powercfg
 	ui_print "- Default mode: balance"
-	if [ ! -f "/sdcard/wipe_mode" ]; then
-		echo "balance" > /sdcard/wipe_mode
-	fi
+	[ ! -f "/sdcard/wipe_mode" ] && echo "balance" > /sdcard/wipe_mode
 	ui_print "- You can choose mode by using this two ways:"
 	ui_print "  1. Enter powercfg \$MODE in terminal"
 	ui_print "  2. Modify wipe_mode in your sdcard and reboot"
