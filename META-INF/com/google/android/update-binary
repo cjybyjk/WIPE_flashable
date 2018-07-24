@@ -79,7 +79,7 @@ ui_print "     Version: 0603.2"
 ui_print "**************************"
 ui_print " "
 
-TMPDIR=/dev/tmp_WIPE
+TMPDIR=/dev/tmp
 
 # get platform
 platform="unsupported"
