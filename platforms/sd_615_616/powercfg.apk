@@ -157,13 +157,13 @@ function verify_param()
 {
 	expected_target=${C0_GOVERNOR_DIR}/target_loads
 	if [ "$action" = "powersave" ]; then
-		expected_value="80 998000:66 1113000:96"
+		expected_value="80 980000:66 1113000:96"
 	elif [ "$action" = "balance" ]; then
-		expected_value="80 800000:63 998000:72 1113000:97"
+		expected_value="80 980000:63 1113000:72 1344000:97"
 	elif [ "$action" = "performance" ]; then
-		expected_value="80 800000:55 998000:75 1113000:98"
+		expected_value="80 980000:55 1113000:75 1344000:98"
 	elif [ "$action" = "fast" ]; then
-		expected_value="80 1113000:90"
+		expected_value="80 1497000:90"
 	fi
 	if [ "`cat ${expected_target}`" = "${expected_value}" ]; then
 		echo "${action} OK"
@@ -224,57 +224,57 @@ fi
 
 if [ "$action" = "powersave" ]; then
 	powersave_custom
-	set_param_little above_hispeed_delay "18000 998000:98000 1113000:138000"
-	set_param_little hispeed_freq 998000
+	set_param_little above_hispeed_delay "18000 1344000:98000 1459000:138000"
+	set_param_little hispeed_freq 1113000
 	set_param_little go_hispeed_load 94
-	set_param_little target_loads "80 998000:66 1113000:96"
+	set_param_little target_loads "80 980000:66 1113000:96"
 	set_param_little min_sample_time 18000
-	set_param_big above_hispeed_delay "18000 1113000:98000 1344000:138000"
-	set_param_big hispeed_freq 1113000
+	set_param_big above_hispeed_delay "18000 1344000:98000 1459000:138000"
+	set_param_big hispeed_freq 1344000
 	set_param_big go_hispeed_load 94
-	set_param_big target_loads "80 960000:66 1113000:96"
+	set_param_big target_loads "80 980000:66 1113000:96"
 	set_param_big min_sample_time 18000
 fi
 
 if [ "$action" = "balance" ]; then
 	balance_custom
-	set_param_little above_hispeed_delay "98000 1113000:138000"
+	set_param_little above_hispeed_delay "98000 1459000:138000"
 	set_param_little hispeed_freq 1113000
 	set_param_little go_hispeed_load 97
-	set_param_little target_loads "80 800000:63 998000:72 1113000:97"
+	set_param_little target_loads "80 980000:63 1113000:72 1344000:97"
 	set_param_little min_sample_time 18000
-	set_param_big above_hispeed_delay "98000 1113000:138000"
-	set_param_big hispeed_freq 1113000
+	set_param_big above_hispeed_delay "98000 1459000:138000"
+	set_param_big hispeed_freq 1344000
 	set_param_big go_hispeed_load 97
-	set_param_big target_loads "80 960000:63 1113000:72 1344000:97"
+	set_param_big target_loads "80 980000:63 1113000:72 1344000:97"
 	set_param_big min_sample_time 18000
 fi
 
 if [ "$action" = "performance" ]; then
 	performance_custom
-	set_param_little above_hispeed_delay "18000 998000:98000 1113000:38000"
-	set_param_little hispeed_freq 998000
+	set_param_little above_hispeed_delay "18000 1344000:98000 1459000:38000"
+	set_param_little hispeed_freq 1113000
 	set_param_little go_hispeed_load 89
-	set_param_little target_loads "80 800000:55 998000:75 1113000:98"
+	set_param_little target_loads "80 980000:55 1113000:75 1344000:98"
 	set_param_little min_sample_time 78000
-	set_param_big above_hispeed_delay "18000 1113600:98000 1344000:38000"
-	set_param_big hispeed_freq 1113600
+	set_param_big above_hispeed_delay "18000 1344000:98000 1459000:38000"
+	set_param_big hispeed_freq 1344000
 	set_param_big go_hispeed_load 89
-	set_param_big target_loads "80 960000:55 1113600:75 1344000:98"
+	set_param_big target_loads "80 980000:55 1113000:75 1344000:98"
 	set_param_big min_sample_time 78000
 fi
 
 if [ "$action" = "fast" ]; then
 	fast_custom
-	lock_value 1380000 ${C0_CPUFREQ_DIR}/scaling_min_freq
-	set_param_little above_hispeed_delay "18000 1113000:198000"
+	lock_value 1113000 ${C0_CPUFREQ_DIR}/scaling_min_freq
+	set_param_little above_hispeed_delay "18000 1459000:198000"
 	set_param_little hispeed_freq 1113000
-	set_param_little target_loads "80 1113000:90"
+	set_param_little target_loads "80 1497000:90"
 	set_param_little min_sample_time 38000
-	lock_value 1380000 ${C1_CPUFREQ_DIR}/scaling_min_freq
-	set_param_big above_hispeed_delay "18000 1344000:198000"
-	set_param_big hispeed_freq 1344000
-	set_param_big target_loads "80 1344000:90"
+	lock_value 1113000 ${C1_CPUFREQ_DIR}/scaling_min_freq
+	set_param_big above_hispeed_delay "18000 1459000:198000"
+	set_param_big hispeed_freq 1113000
+	set_param_big target_loads "80 1497000:90"
 	set_param_big min_sample_time 38000
 fi
 
