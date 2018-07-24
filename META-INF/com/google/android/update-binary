@@ -28,7 +28,7 @@ get_prop() {
 }
 
 get_platform() {
-	if [ ! "unsupported" = "$platform" ]; then
+	if [ "unsupported" != "$platform" ]; then
 		return 0
 	fi
 	case "$1" in
@@ -62,7 +62,7 @@ get_platform() {
 # $1:file $2:add head
 wipe_write() {
 	writefile=$1
-	if [ "$2" = "1" ]; then
+	if [ "$2" == "1" ]; then
 		echo "#!/system/bin/sh" > "$writefile"
 		chmod 0755 "$writefile"
 	fi
@@ -109,10 +109,10 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 	fi
 	ui_print "- Installing..."
 	ui_print "- Checking Magisk Framework"
-	magiskFlag=0
-	[ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ] && magiskFlag=1
-	[ -f /wipe_nomagisk ] &&  magiskFlag=0
-	if [ $magiskFlag -ne 1 ]; then
+	magiskFlag=false
+	[ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ] && magiskFlag=true
+	[ -f /wipe_nomagisk ] &&  magiskFlag=false
+	if [ ! $magiskFlag ]; then
 		mkdir ./mountimg
 		while read lineinText
 		do 
