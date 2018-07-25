@@ -2,6 +2,7 @@
 A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-opt) into your device
 
 ### Version 0603.2
+好用的话记得给颗Star~
 
 ### Thanks to
 [@yc9559](https://github.com/yc9559)
@@ -13,7 +14,7 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 -   重启到Recovery模式下并刷入zip
     (Reboot to recovery mode and flash it.)
 #### 更改模式 (Change Mode)
-##### 自动应用 (Apply on boot)
+##### 自动应用 重启后生效 (Apply on boot)
 -   在终端执行命令
 	(Run command in terminal):
 	```bash
@@ -24,7 +25,7 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 	echo "disabled" > /sdcard/wipe_mode #停用
 	```
 
-##### 临时应用 (Temporary Apply)
+##### 临时应用 立即生效 (Temporary Apply (NOW))
 -   在终端以root身份执行命令
     (Run command as root in terminal): 
     ```bash
