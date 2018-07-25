@@ -1,4 +1,5 @@
 #!/system/bin/sh
+MODDIR=${0%/*}
 # Project WIPE support
 MODE=`cat /sdcard/wipe_mode`
 [ "" == "$MODE" ] && MODE=`cat /data/media/0/wipe_mode`
@@ -10,4 +11,4 @@ while read pathtofile
 	    rm -f /dev/.project_wipe
 	    rm -f /dev/project_wipe_runonce
     fi
-done < ./list_of_magisk
+done < $MODDIR/list_of_magisk
