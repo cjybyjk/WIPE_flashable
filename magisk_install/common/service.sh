@@ -1,6 +1,7 @@
 #!/system/bin/sh
 MODDIR=${0%/*}
 # Project WIPE support
+SEStatus=`getenforce`
 MODE=`cat /sdcard/wipe_mode`
 [ "" == "$MODE" ] && MODE=`cat /data/media/0/wipe_mode`
 [ "disabled" == "$MODE" ] && exit 0
@@ -12,3 +13,4 @@ while read pathtofile
 	    rm -f /dev/project_wipe_runonce
     fi
 done < $MODDIR/list_of_magisk
+setenforce $SEStatus
