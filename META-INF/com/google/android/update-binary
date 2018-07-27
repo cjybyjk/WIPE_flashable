@@ -178,7 +178,6 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 		ui_print "- Magisk Framework found"
 		ui_print "  Copying files..."
 		mkdir -p ./magisk/system/bin/
-		cp ./common/list_of_magisk ./magisk/
 		while read pathtofile
 		do
 		    filepath=${pathtofile%/*}
