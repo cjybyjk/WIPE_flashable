@@ -19,7 +19,7 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 	(Run command in terminal):
 	```bash
 	echo "powersave" > /sdcard/wipe_mode #省电
-	echo "balance" > /sdcard/wipe_mode #平衡
+	echo "balance" > /sdcard/wipe_mode #平衡(默认)
 	echo "performance" > /sdcard/wipe_mode #性能
 	echo "fast" > /sdcard/wipe_mode #低延迟
 	echo "disabled" > /sdcard/wipe_mode #停用
