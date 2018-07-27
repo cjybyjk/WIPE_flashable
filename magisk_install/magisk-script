@@ -10,7 +10,7 @@
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
-TMPDIR=/dev/tmp/magisk_tmp
+TMPDIR=/dev/tmp
 INSTALLER=$TMPDIR/magisk_install
 if [ -d /data/adb/magisk ]; then
 	MAGISKBIN=/data/adb/magisk
@@ -24,8 +24,8 @@ WIPEDIR=$4/magisk
 umask 022
 
 # Initial cleanup
-rm -rf $TMPDIR 2>/dev/null
-mkdir -p $INSTALLER
+#rm -rf $TMPDIR 2>/dev/null
+#mkdir -p $INSTALLER
 
 # echo before loading util_functions
 ui_print() { echo "$1"; }
@@ -76,7 +76,7 @@ $BOOTMODE && boot_actions || recovery_actions
 ##########################################################################################
 
 # Extract common files
-unzip -o "$ZIP" 'magisk_install/*' -d $TMPDIR >&2
+#unzip -o "$ZIP" 'magisk_install/*' -d $TMPDIR >&2
 
 [ ! -f $INSTALLER/config.sh ] && abort "! Unable to extract zip file!"
 # Load configurations
