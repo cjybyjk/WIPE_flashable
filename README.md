@@ -34,6 +34,18 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 	powercfg performance #性能
 	powercfg fast #低延迟
     ```
+#### SELinux问题 (SELinux problem)
+##### 如果这个脚本导致了SELinux问题(例如不正确的SELinux permissive),请按以下步骤操作
+-	安装为magisk模块
+	- 使用文本编辑器打开这些文件(如果存在) , 将 `RestoreSELinux=false` 改为 `RestoreSELinux=true`, 然后保存
+		- /sbin/.core/img/prjWIPE/service.sh
+		- /sbin/.core/img/prjWIPE/system/etc/init.qcom.post_boot.sh
+		- /sbin/.core/img/prjWIPE/system/vendor/bin/init.qcom.post_boot.sh
+-	传统安装方式
+	- 使用文本编辑器打开这些文件(如果存在) , 将 `RestoreSELinux=false` 改为 `RestoreSELinux=true`, 然后保存
+		- /system/etc/init.qcom.post_boot.sh
+		- /vendor/bin/init.qcom.post_boot.sh
+
 #### 卸载 (Uninstall)
 -	下载 WIPE_Flashable Remover
 	(Download WIPE_Flashable Remover.)
