@@ -109,10 +109,14 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 	fi
 	ui_print "- Installing..."
 	ui_print "- Checking Magisk Framework"
-	magiskFlag=false
-	[ -d "/data/adb/magisk" ] || [ -f "/data/magisk.img" ] && magiskFlag=true
-	[ -f /wipe_nomagisk ] &&  magiskFlag=false
-	if [ ! $magiskFlag ]; then
+	magiskFlag=0
+	[ -d "/data/adb/magisk" ] && magiskFlag=1
+	[ -f "/data/magisk.img" ] && magiskFlag=2
+	[ -f "/data/adb/magisk.img" ] && magiskFlag=3
+	[ -f /wipe_nomagisk ] && magiskFlag=0
+	ui_print "- Magisk flag: $magiskFlag"
+	if [ 0 -eq $magiskFlag ]; then
+		flagBootApply=0
 		mkdir ./mountimg
 		while read lineinText
 		do 
@@ -125,7 +129,7 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 				if [ -d "$pathtofile" ]; then
 					ui_print "  $pathtofile found, creating file on it..."
 					wipe_write "$pathtofile/99prjwipe" 1
-					flagBootApply=true
+					flagBootApply=1
 					ui_print "  copying powercfg to system/bin"
 					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
 					chmod 0755 /system/bin/powercfg
@@ -143,7 +147,7 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 					fi
 					ui_print "  $pathtofile found, adding lines to it..."
 					wipe_write "$pathtofile" 0
-					flagBootApply=true
+					flagBootApply=1
 					ui_print "  copying powercfg to system/bin"
 					cp ./platforms/$platform/powercfg.apk /system/bin/powercfg
 					chmod 0755 /system/bin/powercfg
@@ -165,7 +169,7 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 					fi
 					ui_print "  creating file on $bootinIMG..."
 					wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
-					flagBootApply=true
+					flagBootApply=1
 					ui_print "  Unmounting $pathtofile"
 					umount ./mountimg
 					break
@@ -173,7 +177,7 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 			;;
 			esac
 		done < ./common/list_of_bootable
-		[ ! $flagBootApply ] && ui_print "! WARNING: No method to apply on boot!"
+		[ 0 -eq $flagBootApply ] && ui_print "! WARNING: No method to apply on boot!"
 	else
 		ui_print "- Magisk Framework found"
 		ui_print "  Copying files..."
