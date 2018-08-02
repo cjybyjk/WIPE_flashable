@@ -49,13 +49,13 @@ get_platform() {
 		# Intel Atom
 		"moorefield" ) platform="atom_z3560_z3580";;
 		# Samsung Exynos
-		"universal7420" ) platform="exynos_7420";;
-		"universal8890" ) platform="exynos_8890";;
-		"universal8895" ) platform="exynos_8895";;
+		"universal7420" | "exynos7420" ) platform="exynos_7420";;
+		"universal8890" | "exynos8890" ) platform="exynos_8890";;
+		"universal8895" | "exynos8895" ) platform="exynos_8895";;
 		# Hwawei Kirin
-		"hi3650" ) platform="kirin_950_955";;
-		"hi3660" ) platform="kirin_960";;
-		"hi3670" ) platform="kirin_970";;
+		"hi3650" | "kirin950" | "kirin955" ) platform="kirin_950_955";;
+		"hi3660" | "kirin960" ) platform="kirin_960";;
+		"hi3670" | "kirin970" ) platform="kirin_970";;
 	esac
 }
 
