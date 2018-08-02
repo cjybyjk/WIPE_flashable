@@ -1,7 +1,7 @@
 # WIPE_flashable
 A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-opt) into your device
 
-### Version 0603.2
+### Version UserCustom
 好用的话记得给颗Star~
 
 ### Thanks to
