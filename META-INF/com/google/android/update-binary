@@ -54,10 +54,12 @@ magiskFlag=0
 [ -d "/data/adb/magisk" ] && magiskFlag=1
 [ -f "/data/magisk.img" ] && magiskFlag=2
 [ -f "/data/adb/magisk.img" ] && magiskFlag=3
-[ -f /wipe_nomagisk ] && magiskFlag=0
+[ -f "/wipe_nomagisk" ] && magiskFlag=0
 ui_print "- Magisk flag: $magiskFlag"
 if [ 0 -eq $magiskFlag ]; then
 	flagBootApply=0
+	flagApplyOnce=true
+	[ -f "/wipe_no_apply_once" ] && flagApplyOnce=false
 	mkdir ./mountimg
 	while read lineinText
 	do 
@@ -70,11 +72,11 @@ if [ 0 -eq $magiskFlag ]; then
 			if [ -d "$pathtofile" ]; then
 				ui_print "  $pathtofile found, creating file on it..."
 				wipe_write "$pathtofile/99prjwipe" 1
-				flagBootApply=1
+				let flagBootApply=flagBootApply+1
 				ui_print "  copying powercfg to system/bin"
 				cp ./powercfg /system/bin/powercfg
 				chmod 0755 /system/bin/powercfg
-				break
+				$flagApplyOnce && break
 			fi
 		;;
 		"[F]" )
@@ -88,11 +90,11 @@ if [ 0 -eq $magiskFlag ]; then
 				fi
 				ui_print "  $pathtofile found, adding lines to it..."
 				wipe_write "$pathtofile" 0
-				flagBootApply=1
+				let flagBootApply=flagBootApply+1
 				ui_print "  copying powercfg to system/bin"
 				cp ./powercfg /system/bin/powercfg
 				chmod 0755 /system/bin/powercfg
-				break
+				$flagApplyOnce && break
 			fi
 		;;
 		"[I]" )
@@ -110,10 +112,10 @@ if [ 0 -eq $magiskFlag ]; then
 				fi
 				ui_print "  creating file on $bootinIMG..."
 				wipe_write "./mountimg/$bootinIMG/99prjwipe" 1
-				flagBootApply=1
+				let flagBootApply=flagBootApply+1
 				ui_print "  Unmounting $pathtofile"
 				umount ./mountimg
-				break
+				$flagApplyOnce && break
 			fi
 		;;
 		esac

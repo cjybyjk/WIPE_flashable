@@ -11,8 +11,18 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 #### 刷入 (Flash)
 -   下载zip到你的设备中 
     (Download zip to your device.)
--   重启到Recovery模式下并刷入zip
+-	将zip中的powercfg文件替换为你自己的powercfg文件 
+	(Replace powercfg in the zip with your own powercfg)
+-   重启到Recovery模式下并刷入修改后的zip
     (Reboot to recovery mode and flash it.)
+	- 如果不想安装为magisk模块,可以执行这个命令后重新刷入 
+	```bash
+		touch /wipe_no_magisk
+	```
+	- 如果以传统模式安装后没有成功应用,可以执行这个命令后重新刷入
+	```bash
+		touch /wipe_no_apply_once
+	```
 #### 更改模式 (Change Mode)
 ##### 自动应用 重启后生效 (Apply on boot)
 -   在终端执行命令
@@ -60,5 +70,3 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 	(Download WIPE_Flashable Remover.)
 -   重启到Recovery模式下并刷入
     (Reboot to recovery mode and flash it.)
-
-[下载卡刷包 (Download the flashable ZIP)](https://github.com/cjybyjk/WIPE_flashable/releases)
