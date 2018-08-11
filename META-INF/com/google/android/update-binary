@@ -205,10 +205,10 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 	[ -L "/data/powercfg" ] && rm /data/powercfg
 	ln -s /system/bin/powercfg /data/powercfg
 	ui_print "- Default mode: balance"
-	[ ! -f "/sdcard/wipe_mode" ] && echo "balance" > /sdcard/wipe_mode
+	[ ! -f "/data/wipe_mode" ] && echo "balance" > /data/wipe_mode
 	ui_print "- You can choose mode by using this two ways:"
 	ui_print "  1. Enter powercfg \$MODE in terminal"
-	ui_print "  2. Modify wipe_mode in your sdcard and reboot"
+	ui_print "  2. Modify /data/wipe_mode and reboot"
 else
 	ui_print "! Unsupported device!"
 	ui_print "  Please check this:"
