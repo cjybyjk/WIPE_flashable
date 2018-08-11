@@ -24,14 +24,14 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 	```
 #### 更改模式 (Change Mode)
 ##### 自动应用 重启后生效 (Apply on boot)
--   在终端执行命令
-	(Run command in terminal):
+-   在终端以root身份执行命令
+	(Run command as root in terminal):
 	```bash
-	echo "powersave" > /sdcard/wipe_mode #省电
-	echo "balance" > /sdcard/wipe_mode #平衡(默认)
-	echo "performance" > /sdcard/wipe_mode #性能
-	echo "fast" > /sdcard/wipe_mode #低延迟
-	echo "disabled" > /sdcard/wipe_mode #停用
+	echo "powersave" > /data/wipe_mode #省电
+	echo "balance" > /data/wipe_mode #平衡(默认)
+	echo "performance" > /data/wipe_mode #性能
+	echo "fast" > /data/wipe_mode #低延迟
+	echo "disabled" > /data/wipe_mode #停用
 	```
 
 ##### 临时应用 立即生效 (Temporary Apply (NOW))
