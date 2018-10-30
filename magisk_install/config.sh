@@ -63,9 +63,6 @@ REPLACE="
 # Construct your own list here, it will override the example above
 # !DO NOT! remove this if you don't need to replace anything, leave it empty as it is now
 REPLACE="
-/system/etc/init.qcom.post_boot.sh
-/vendor/bin/init.qcom.post_boot.sh
-/system/vendor/bin/init.qcom.post_boot.sh
 "
 
 ##########################################################################################
