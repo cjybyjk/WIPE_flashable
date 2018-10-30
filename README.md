@@ -48,8 +48,6 @@ A script for flash [Project_WIPE](https://github.com/yc9559/cpufreq-interactive-
 -	安装为magisk模块
 	- 使用文本编辑器打开这些文件(如果存在) , 将 `RestoreSELinux=false` 改为 `RestoreSELinux=true`, 然后保存
 		- /sbin/.core/img/prjWIPE/service.sh
-		- /sbin/.core/img/prjWIPE/system/etc/init.qcom.post_boot.sh
-		- /sbin/.core/img/prjWIPE/system/vendor/bin/init.qcom.post_boot.sh
 -	SuperSU Systemless
 	- 使用文本编辑器打开这些文件(如果存在) , 将 `RestoreSELinux=false` 改为 `RestoreSELinux=true`, 然后保存
 		- /su/su.d/99prjwipe
