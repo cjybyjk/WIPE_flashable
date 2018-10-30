@@ -184,15 +184,6 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 		ui_print "- Magisk Framework found"
 		ui_print "  Copying files..."
 		mkdir -p ./magisk/system/bin/
-		while read pathtofile
-		do
-		    filepath=${pathtofile%/*}
-		    if [ -f "/$pathtofile" ]; then
-			    mkdir -p ./magisk/$filepath
-			    cp /$pathtofile ./magisk/$pathtofile
-			    [ `grep -c "Project WIPE support" ./magisk/$pathtofile` -eq 0 ] && wipe_write "./magisk/$pathtofile" 0
-		    fi
-		done < ./common/list_of_magisk
 		cp ./platforms/$platform/powercfg.apk ./magisk/system/bin/powercfg
 		ui_print "  Running install script"
 		sh ./magisk_install/magisk-script $1 $2 $3 $PWD

@@ -2,15 +2,23 @@
 MODDIR=${0%/*}
 # Project WIPE support
 
+# wait for boot animation stopped
+until [ "`getprop init.svc.bootanim`" = "stopped" ]
+do
+sleep 10
+done
+
+#SELinux restore flag
 RestoreSELinux=false
 SEStatus=`getenforce`
 
+# mode detect
 MODE=`cat /data/wipe_mode`
 [ "" == "$MODE" ] && MODE=`cat /sdcard/wipe_mode`
 [ "" == "$MODE" ] && MODE=`cat /data/media/0/wipe_mode`
 [ "disabled" == "$MODE" ] && exit 0
-rm -f /dev/.project_wipe
-rm -f /dev/project_wipe_runonce
+
 powercfg $MODE > /dev/project_wipe_state
 
+# restore SELinux
 $RestoreSELinux && setenforce $SEStatus
