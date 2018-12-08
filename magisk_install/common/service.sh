@@ -2,8 +2,8 @@
 MODDIR=${0%/*}
 # Project WIPE support
 
-# wait for boot animation stopped
-until [ "`getprop init.svc.bootanim`" = "stopped" ]
+# wait for boot complete
+until [ "`getprop sys.boot_completed`" = "1" ]
 do
 sleep 10
 done
