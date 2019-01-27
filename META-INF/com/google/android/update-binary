@@ -198,14 +198,14 @@ if [ -f "./platforms/$platform/powercfg.apk" ]; then
 		ui_print " found:Vboot"
 		if [ ! -f "/data/powercfg" ]; then
 			ui_print "link: /data/powercfg <- /system/bin/powercfg"
-			ln -s /system/powercfg /data/powercfg
+			ln -s /system/bin/powercfg /data/powercfg
 		fi
 	fi
 	if [ -d "/data/data/com.omarea.vtools" ]; then
 		ui_print " found:Scene"
 		if [ ! -f "/data/powercfg.sh" ]; then
 			ui_print "link: /data/powercfg.sh <- /system/bin/powercfg"
-			ln -s /system/powercfg /data/powercfg.sh
+			ln -s /system/bin/powercfg /data/powercfg.sh
 		fi
 	fi
 	ui_print "- Default mode: balance"
